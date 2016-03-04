@@ -1,26 +1,18 @@
-// ======= Copyright (c) 2012, Unknown Worlds Entertainment, Inc. All rights reserved. ============
-//    
-// lua\TeamMessenger.lua    
-//    
-//    Created by:   Brian Cronin (brianc@unknownworlds.com)    
-//    
-// ========= For more information, visit us at http://www.unknownworlds.com =====================
-
 kTeamMessageTypes = enum({ 'GameStarted', 'PowerLost', 'PowerRestored', 'Eject', 'CannotSpawn',
                            'SpawningWait', 'Spawning', 'ResearchComplete', 'ResearchLost',
                            'HiveConstructed', 'HiveLowHealth', 'HiveKilled',
                            'CommandStationUnderAttack', 'IPUnderAttack', 'HiveUnderAttack',
                            'PowerPointUnderAttack', 'Beacon', 'NoCommander', 'TeamsUnbalanced',
-                           'TeamsBalanced', 'GameStartCommanders' })
+                           'TeamsBalanced', 'GameStartCommanders', 'ReturnToBase' })
 
 local kTeamMessages = { }
 
 kTeamMessages[kTeamMessageTypes.GameStarted] = { text = { [kMarineTeamType] = "MARINE_TEAM_GAME_STARTED", [kAlienTeamType] = "ALIEN_TEAM_GAME_STARTED" } }
 
-// This function will generate the string to display based on a location Id.
+-- This function will generate the string to display based on a location Id.
 local locationStringGen = function(locationId, messageString) return string.format(Locale.ResolveString(messageString), Shared.GetString(locationId)) end
 
-// Thos function will generate the string to display based on a research Id.
+-- Thos function will generate the string to display based on a research Id.
 local researchStringGen = function(researchId, messageString) return string.format(Locale.ResolveString(messageString), GetDisplayNameForTechId(researchId)) end
 
 kTeamMessages[kTeamMessageTypes.PowerLost] = { text = { [kMarineTeamType] = function(data) return locationStringGen(data, "POWER_LOST") end } }
@@ -65,8 +57,10 @@ kTeamMessages[kTeamMessageTypes.TeamsBalanced] = { text = { [kMarineTeamType] = 
 
 kTeamMessages[kTeamMessageTypes.GameStartCommanders] = { text = { [kMarineTeamType] = "GAME_START_COMMANDERS", [kAlienTeamType] = "GAME_START_COMMANDERS" } }
 
+kTeamMessages[kTeamMessageTypes.ReturnToBase] = { text = { [kMarineTeamType] = "RETURN_TO_BASE", [kAlienTeamType] = "RETURN_TO_BASE" } }
+--TODO: Translate
 
-// Silly name but it fits the convention.
+-- Silly name but it fits the convention.
 local kTeamMessageMessage =
 {
     type = "enum kTeamMessageTypes",
@@ -77,93 +71,92 @@ Shared.RegisterNetworkMessage("TeamMessage", kTeamMessageMessage)
 
 if Server then
 
-    /**
-     * Sends every team the passed in message for display.
-     */
+    -- Sends every team the passed in message for display.
     function SendGlobalMessage(messageType, optionalData)
-    
+
         if GetGamerules():GetGameStarted() then
-        
+
             local teams = GetGamerules():GetTeams()
             for t = 1, #teams do
                 SendTeamMessage(teams[t], messageType, optionalData)
             end
-            
+
         end
-        
+
     end
-    
-    /**
-     * Sends every player on the passed in team the passed in message for display.
-     */
+
+
+     --Sends every player on the passed in team the passed in message for display.
     function SendTeamMessage(team, messageType, optionalData)
-    
+
         local function SendToPlayer(player)
             Server.SendNetworkMessage(player, "TeamMessage", { type = messageType, data = optionalData or 0 }, true)
         end
-        
+
         team:ForEachPlayer(SendToPlayer)
-        
+
     end
-    
-    /**
-     * Sends the passed in message to the players passed in.
-     */
+
+    -- Sends the passed in message to the players passed in.
     function SendPlayersMessage(playerList, messageType, optionalData)
-    
+
         if GetGamerules():GetGameStarted() then
-        
+
             for p = 1, #playerList do
                 Server.SendNetworkMessage(playerList[p], "TeamMessage", { type = messageType, data = optionalData or 0 }, true)
             end
-            
+
         end
-        
+
     end
-    
+
     local function TestTeamMessage(client)
-    
+
         local player = client:GetControllingPlayer()
         if player then
             SendPlayersMessage({ player }, kTeamMessageTypes.NoCommander)
         end
-        
+
     end
-    
+
     Event.Hook("Console_ttm", TestTeamMessage)
-    
+
 end
 
 if Client then
 
     local function SetTeamMessage(messageType, messageData)
-    
+
         local player = Client.GetLocalPlayer()
         if player and HasMixin(player, "TeamMessage") then
-        
-            local displayText = kTeamMessages[messageType].text[player:GetTeamType()]
-            
-            if displayText then
-            
-                if type(displayText) == "function" then
-                    displayText = displayText(messageData)
-                else
-                    displayText = Locale.ResolveString(displayText)
+
+            if Client.GetOptionInteger("hudmode", kHUDMode.Full) == kHUDMode.Full then
+
+                local displayText = kTeamMessages[messageType].text[player:GetTeamType()]
+
+                if displayText then
+
+                    if type(displayText) == "function" then
+                        displayText = displayText(messageData)
+                    else
+                        displayText = Locale.ResolveString(displayText)
+                    end
+
+                    assert(type(displayText) == "string")
+                    player:SetTeamMessage(string.UTF8Upper(displayText))
+
                 end
-                
-                assert(type(displayText) == "string")
-                player:SetTeamMessage(string.upper(displayText))
-                
+
             end
-            
+
         end
-        
+
     end
-    
+
     function OnCommandTeamMessage(message)
-        // SetTeamMessage(message.type, message.data)
+        SetTeamMessage(message.type, message.data)
     end
-    
+
     Client.HookNetworkMessage("TeamMessage", OnCommandTeamMessage)
-    
+
 end

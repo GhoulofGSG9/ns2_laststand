@@ -1,0 +1,7 @@
+Script.Load("lua/LastStand_PickupableMixin.lua")
+Script.Load("lua/LastStand_MarineTeam.lua")
+Script.Load("lua/LastStand_AlienTeam.lua")
+Script.Load("lua/LastStand_ReadyRoomTeam.lua")
+Script.Load("lua/LastStand_DropPack.lua")
+Script.Load("lua/LastStand_Commands.lua")
+Script.Load("lua/LastStand_TechTree_Server.lua")

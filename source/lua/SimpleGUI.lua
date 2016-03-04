@@ -1,6 +1,6 @@
 Script.Load('lua/easing.lua')
 
-// Constants
+-- Constants
 
 local kSGRegionX = 1
 local kSGRegionY = 2
@@ -13,7 +13,7 @@ local kSGSet = 2
 local kSGLerp = 3
 
 
-// Properties
+-- Properties
 local function _Lerp(from, to, t)
     return from + (to - from) * t
 end
@@ -31,11 +31,11 @@ kSGPosition = { GUIItem.GetPosition, GUIItem.SetPosition, _Lerp }
 kSGSize = { GUIItem.GetSize, GUIItem.SetSize, _Lerp }
 kSGScale = { GUIItem.GetScale, GUIItem.SetScale, _Lerp }
 
-// Texture atlas
+-- Texture atlas
 function SGMakeAtlas(name, regions)
     local texture = PrecacheAsset(name)
-    // Append the texture to each region
-    for name, region in pairs(regions) do
+    -- Append the texture to each region
+    for _, region in pairs(regions) do
         table.insert(region, texture)
     end
     return regions
@@ -49,7 +49,7 @@ function SGGetRegionSize(region)
     return region[kSGRegionWidth], region[kSGRegionHeight]
 end
 
-// Misc helpers
+-- Misc helpers
 function SGSetSizeAndCenter(item, width, height)
     item:SetSize(Vector(width, height, 0))
     item:SetAnchor(GUIItem.Middle, GUIItem.Center)    
@@ -75,7 +75,7 @@ function SGDelay(curve, waitTime, totalTime)
     end
 end
 
-// Menu
+-- Menu
 function SGCreateMenu()
     return {
         items={},
@@ -132,12 +132,17 @@ end
 
 function SGSendKeyEvent(menu, key, down)
 
+    local success = false
+
     for i = 1, #menu.items do    
         local item = menu.items[i]        
         if item.isMouseOver and item.OnSendKeyEvent then
             item:OnSendKeyEvent(key, down)
+            success = true
         end        
     end
+    
+    return success
     
 end
 
@@ -186,14 +191,14 @@ function SGAddText(menu, parent, text, fontName, color)
 end
 
 function SGAddAnim(menu, duration, func, callbackFunc)
-    anim = {duration=duration, time=0, func=func, callback=callbackFunc}
+    local anim = {duration=duration, time=0, func=func, callback=callbackFunc}
     table.insert(menu.anims, anim)
     return anim
 end
 
 function SGAddPropertyAnim(menu, item, property, newValue, duration, curveFunc, callbackFunc)   
     
-    // Remove previous animation of this property
+    -- Remove previous animation of this property
     for i = 1, #menu.anims do
         local anim = menu.anims[i]
         if anim.item == item and anim.property == property then

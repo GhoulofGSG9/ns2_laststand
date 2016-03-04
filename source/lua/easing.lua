@@ -11,7 +11,7 @@ TERMS OF USE - EASING EQUATIONS
 
 Open source under the BSD License.
 
-Copyright © 2001 Robert Penner
+Copyright ï¿½ 2001 Robert Penner
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -294,6 +294,7 @@ local function inOutElastic(t, b, c, d, a, p)
   if not p then p = d * (0.3 * 1.5) end
   if not a then a = 0 end
 
+  local s = 0
   if not a or a < abs(c) then
     a = c
     s = p / 4

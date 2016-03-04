@@ -1,0 +1,7 @@
+modEntry = {
+	Client = "lua/LastStand_Client.lua",
+	Server = "lua/LastStand_Server.lua",
+    Shared = "lua/LastStand_Shared.lua",
+	FileHooks = "lua/LastStand_FileHooks.lua",
+	Priority = 10
+}

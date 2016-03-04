@@ -1,0 +1,1 @@
+mods = { "ns2", "Last Stand" }

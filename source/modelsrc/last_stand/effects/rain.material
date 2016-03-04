@@ -1,0 +1,7 @@
+shader = "cinematics/vfx_materials/2em_scroll_vtxcolor.surface_shader"
+
+emissiveMap1 = "models/effects/sprinklers_top.dds"
+emissiveMap2 = "models/effects/sprinklers_top.dds"
+tint = [2, 2.2, 2.5]
+em1Coord = [7, 1.5, 1, -2.5]
+em2Coord = [2, .2, .5, -.8]

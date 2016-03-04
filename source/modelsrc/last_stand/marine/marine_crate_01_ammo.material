@@ -1,0 +1,6 @@
+shader = "shaders/model.surface_shader"
+albedoMap = "models/last_stand/marine/marine_crate_01_ammo.dds"
+normalMap = "models/last_stand/marine/marine_crate_01_normal.dds"
+specularMap = "models/last_stand/marine/marine_crate_01_spec.dds"
+
+surface = "metal"

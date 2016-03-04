@@ -1,23 +1,14 @@
-// ======= Copyright (c) 2003-2012, Unknown Worlds Entertainment, Inc. All rights reserved. =====
-//    
-// lua\InfestationMixin.lua    
-//    
-//    Created by:   Brian Cronin (brianc@unknownworlds.com)    
-//    
-//    Anything that spawns Infestation should use this.
-//    
-// ========= For more information, visit us at http://www.unknownworlds.com =====================    
-
 InfestationMixin = CreateMixin(InfestationMixin)
 InfestationMixin.type = "Infestation"
 
-// Whatever uses the InfestationMixin needs to implement the following callback functions.
+-- Whatever uses the InfestationMixin needs to implement the following callback functions.
 InfestationMixin.expectedCallbacks = 
 {
     GetInfestationRadius = "How far infestation should spread from entity." 
 }
 
 local gInfestationMultiplier = 1
+local gInfestationRecedeMultiplier = 2
 
 InfestationMixin.networkVars =
 {
@@ -41,7 +32,7 @@ local function GenerateInfestationCoords(origin, normal)
 end
 
 local function CreateInfestation(self)
-
+    
     self.infestationPatches = {}
     local coords = self:GetCoords()
     local attached = self:GetAttached()
@@ -49,54 +40,55 @@ local function CreateInfestation(self)
     
     if attached then
     
-        // Add a small offset, otherwise we are not able to track the infested state of the techpoint.
+        -- Add a small offset, otherwise we are not able to track the infested state of the techpoint.
         coords = attached:GetCoords()
         coords.origin = coords.origin + Vector(0.1, 0, 0.1)
         
     end
     
-    // Floor.
+    local teamNumber --self:GetTeamNumber()
+    -- Floor.
     local radius = self:GetInfestationRadius()
-    table.insert(self.infestationPatches, CreateStructureInfestation(self, coords, self:GetTeamNumber(), radius, blobMultiplier))    
+    table.insert(self.infestationPatches, CreateStructureInfestation(self, coords, teamNumber, radius, blobMultiplier))    
     
-    // Ceiling.
+    -- Ceiling.
     local trace = Shared.TraceRay(self:GetOrigin() + coords.yAxis * 0.1, self:GetOrigin() + coords.yAxis * radius,  CollisionRep.Default,  PhysicsMask.Bullets, EntityFilterAll())
     local roomMiddlePoint = self:GetOrigin() + coords.yAxis * 0.1
     if trace.fraction ~= 1 then
         
-        table.insert(self.infestationPatches, CreateStructureInfestation(self, GenerateInfestationCoords(trace.endPoint, trace.normal), self:GetTeamNumber(), radius, blobMultiplier))
+        table.insert(self.infestationPatches, CreateStructureInfestation(self, GenerateInfestationCoords(trace.endPoint, trace.normal), teamNumber, radius, blobMultiplier))
         roomMiddlePoint = (trace.endPoint - self:GetOrigin()) * 0.5 + self:GetOrigin()
         
     end
     
-    // Front wall.
+    -- Front wall.
     trace = Shared.TraceRay(roomMiddlePoint, roomMiddlePoint + coords.zAxis * radius, CollisionRep.Default,  PhysicsMask.Bullets, EntityFilterAll())
     if trace.fraction ~= 1 then    
-        table.insert(self.infestationPatches, CreateStructureInfestation(self, GenerateInfestationCoords(trace.endPoint, trace.normal), self:GetTeamNumber(), radius, blobMultiplier))        
+        table.insert(self.infestationPatches, CreateStructureInfestation(self, GenerateInfestationCoords(trace.endPoint, trace.normal), teamNumber, radius, blobMultiplier))        
     end
     
-    // Back wall.
+    -- Back wall.
     trace = Shared.TraceRay(roomMiddlePoint, roomMiddlePoint - coords.zAxis * radius, CollisionRep.Default,  PhysicsMask.Bullets, EntityFilterAll())
     if trace.fraction ~= 1 then    
-        table.insert(self.infestationPatches, CreateStructureInfestation(self, GenerateInfestationCoords(trace.endPoint, trace.normal), self:GetTeamNumber(), radius, blobMultiplier))        
+        table.insert(self.infestationPatches, CreateStructureInfestation(self, GenerateInfestationCoords(trace.endPoint, trace.normal), teamNumber, radius, blobMultiplier))        
     end
     
-    // Left wall.
+    -- Left wall.
     trace = Shared.TraceRay(roomMiddlePoint, roomMiddlePoint + coords.xAxis * radius, CollisionRep.Default,  PhysicsMask.Bullets, EntityFilterAll())
     if trace.fraction ~= 1 then    
-        table.insert(self.infestationPatches, CreateStructureInfestation(self, GenerateInfestationCoords(trace.endPoint, trace.normal), self:GetTeamNumber(), radius, blobMultiplier))        
+        table.insert(self.infestationPatches, CreateStructureInfestation(self, GenerateInfestationCoords(trace.endPoint, trace.normal), teamNumber, radius, blobMultiplier))        
     end
     
-    // Right wall.
+    -- Right wall.
     trace = Shared.TraceRay(roomMiddlePoint, roomMiddlePoint - coords.xAxis * radius, CollisionRep.Default,  PhysicsMask.Bullets, EntityFilterAll())
     if trace.fraction ~= 1 then
-        table.insert(self.infestationPatches, CreateStructureInfestation(self, GenerateInfestationCoords(trace.endPoint, trace.normal), self:GetTeamNumber(), radius, blobMultiplier))
+        table.insert(self.infestationPatches, CreateStructureInfestation(self, GenerateInfestationCoords(trace.endPoint, trace.normal), teamNumber, radius, blobMultiplier))
     end
 
     if self.startGrown or GetAndCheckBoolean(self.startsBuilt, "startsBuilt", false) then    
         self:SetInfestationFullyGrown()
     else
-        // start growing from this point in time
+        -- start growing from this point in time
         self:SetInfestationRadius(0)
     end
     
@@ -167,7 +159,7 @@ end
 
 function InfestationMixin:OnKill()
     
-    // trigger receed
+    -- trigger receed
     self:SetDesiredInfestationRadius(0)
     
 end
@@ -175,6 +167,10 @@ end
 function InfestationMixin:SetInfestationFullyGrown()
     self.startGrown = true
     self:SetInfestationRadius(self.desiredInfestationRadius)
+end
+
+function InfestationMixin:GetIsLiveEntitiy()
+    return true
 end
 
 function InfestationMixin:SetDesiredInfestationRadius(desiredInfestationRadius)
@@ -193,7 +189,13 @@ end
 
 function InfestationMixin:GetCurrentInfestationRadius()
 
-    local gowth = (Shared.GetTime() - self.infestationChangeTime) * self.growthRate
+    if self.infestationRadius == self.desiredInfestationRadius then
+        return self.desiredInfestationRadius
+    end
+
+    local growthRateMultiplier = self.desiredInfestationRadius < self.infestationRadius and gInfestationRecedeMultiplier or 1
+
+    local gowth = (Shared.GetTime() - self.infestationChangeTime) * self.growthRate * growthRateMultiplier
     local radius = Slerp(self.infestationRadius, self.desiredInfestationRadius, gowth)
     return radius
 
@@ -219,7 +221,7 @@ function InfestationMixin:UpdateInfestation(deltaTime)
     local isOverHead = Client and PlayerUI_IsOverhead()
     local visible = self:GetIsVisible()
     
-    // update infestation patches
+    -- update infestation patches
     for i = 1, #self.infestationPatches do
     
         local infestation = self.infestationPatches[i]
@@ -228,21 +230,28 @@ function InfestationMixin:UpdateInfestation(deltaTime)
         
         if Client then
             infestation:SetCloakFraction(cloakFraction)
-            infestation:SetIsVisible(visible and (not isOverHead or infestation.coords.yAxis.y > 0.5))
+            infestation:SetIsVisible(visible and (not isOverHead or infestation.coords.yAxis.y > 0.55))
         end
     
     end
     
-    if not self:GetIsAlive() and self:GetCurrentInfestationRadius() == 0 then        
-        self.allowDestruction = true        
+    if self:GetIsLiveEntitiy() then
+        if self:GetIsAlive() and radius == 0 then        
+            self.allowDestruction = true
+        end
     end
+    
+    self.currentInfestationRadius = radius
 
+end
+
+function InfestationMixin:GetCurrentInfestationRadiusCached()
+    return self.currentInfestationRadius or 0
 end
 
 function InfestationMixin:GetDestructionAllowed(destructionAllowedTable)
     destructionAllowedTable.allowed = destructionAllowedTable.allowed and self.allowDestruction
 end
-
 
 if Server then
 

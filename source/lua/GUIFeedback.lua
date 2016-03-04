@@ -11,23 +11,24 @@
 
 class 'GUIFeedback' (GUIScript)
 
-GUIFeedback.kFontSize = 14
-GUIFeedback.kTextFontName = "fonts/AgencyFB_tiny.fnt"
-GUIFeedback.kTextColor = Color(1.0, 1.0, 1.0, 0.5)
-GUIFeedback.kTextOffset = Vector(3, 8, 0)
+function GUIFeedback:OnResolutionChanged(oldX, oldY, newX, newY)
+    self:Uninitialize()
+    self:Initialize()
+end
 
 function GUIFeedback:Initialize()
 
     self.buildText = GUIManager:CreateTextItem()
-    self.buildText:SetFontSize(GUIFeedback.kFontSize)
-    self.buildText:SetFontName(GUIFeedback.kTextFontName)
+    self.buildText:SetScale(GetScaledVector())
+    self.buildText:SetFontName(Fonts.kAgencyFB_Tiny)
+    GUIMakeFontScale(self.buildText)
     self.buildText:SetAnchor(GUIItem.Left, GUIItem.Top)
     self.buildText:SetTextAlignmentX(GUIItem.Align_Min)
     self.buildText:SetTextAlignmentY(GUIItem.Align_Center)
-    self.buildText:SetPosition(GUIFeedback.kTextOffset)
-    self.buildText:SetColor(GUIFeedback.kTextColor)
+    self.buildText:SetPosition(GUIScale(Vector(3, 8, 0)))
+    self.buildText:SetColor(Color(1.0, 1.0, 1.0, 0.5))
     self.buildText:SetFontIsBold(true)
-    self.buildText:SetText(Locale.ResolveString("BETA_MAINMENU") .. tostring(Shared.GetBuildNumber()))
+    self.buildText:SetText(Locale.ResolveString("BETA_MAINMENU") .. tostring(Shared.GetBuildNumber()) .. " LS Version " .. ToString(kLastStandVersion))
     
 end
 
@@ -36,7 +37,6 @@ function GUIFeedback:Uninitialize()
     if self.buildText then
         GUI.DestroyItem(self.buildText)
         self.buildText = nil
-        self.feedbackText = nil
     end
     
 end

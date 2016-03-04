@@ -6,8 +6,52 @@
 //    
 // ========= For more information, visit us at http://www.unknownworlds.com =====================    
 
-local kFindWeaponRange = 2.0
-local kIconUpdateRate = 0.1
+local kFindWeaponRange = 2
+local kIconUpdateRate = 0.5
+
+local function SortByValue(item1, item2)
+
+    local cost1 = HasMixin(item1, "Tech") and LookupTechData(item1:GetTechId(), kTechDataCostKey, 0) or 0
+    local cost2 = HasMixin(item2, "Tech") and LookupTechData(item2:GetTechId(), kTechDataCostKey, 0) or 0
+
+    return cost1 > cost2
+
+end
+
+local function FindNearbyWeapon(self, toPosition)
+
+    local nearbyWeapons = GetEntitiesWithMixinWithinRange("Pickupable", toPosition, kFindWeaponRange)
+    table.sort(nearbyWeapons, SortByValue)
+    
+    local closestWeapon = nil
+    local closestDistance = Math.infinity
+    local cost = 0
+    
+    for i, nearbyWeapon in ipairs(nearbyWeapons) do
+    
+        if nearbyWeapon:isa("Weapon") and nearbyWeapon:GetIsValidRecipient(self) then
+        
+            local nearbyWeaponDistance = (nearbyWeapon:GetOrigin() - toPosition):GetLengthSquared()
+            local currentCost = HasMixin(nearbyWeapon, "Tech") and LookupTechData(nearbyWeapon:GetTechId(), kTechDataCostKey, 0) or 0
+
+            if currentCost < cost then            
+                break
+                
+            else    
+            
+                closestWeapon = nearbyWeapon
+                closestDistance = nearbyWeaponDistance
+                cost = currentCost
+            
+            end
+            
+        end
+        
+    end
+    
+    return closestWeapon
+
+end
 
 MarineActionFinderMixin = CreateMixin( MarineActionFinderMixin )
 MarineActionFinderMixin.type = "MarineActionFinder"
@@ -24,10 +68,6 @@ function MarineActionFinderMixin:__initmixin()
         self.actionIconGUI = GetGUIManager():CreateGUIScript("GUIActionIcon")
         self.actionIconGUI:SetColor(kMarineFontColor)
         self.lastMarineActionFindTime = 0
-
-        // client-only cache for highlighting
-        self.weaponTarget = nil 
-        self.useTarget = nil
         
     end
     
@@ -44,115 +84,58 @@ function MarineActionFinderMixin:OnDestroy()
     
 end
 
-function MarineActionFinderMixin:TraceForActionTargets(isValidTraceFunc)
-
-    local viewDirection = self:GetViewCoords().zAxis
-    local lineStart = self:GetEyePos()
-    local lineEnd = lineStart + viewDirection*kFindWeaponRange
-
-    // First try a thin ray
-    local trace = Shared.TraceRay( lineStart, lineEnd, CollisionRep.Default, PhysicsMask.AllButPCsAndRagdolls, EntityFilterTwo(self, self:GetActiveWeapon()) )
-
-    if isValidTraceFunc(self, trace) then
-        return trace.entity
-    end
-
-    // Defer to a sphere (capsule with 0 height) trace
-    trace = Shared.TraceCapsule( lineStart, lineEnd, 0.2, 0, CollisionRep.Default, PhysicsMask.AllButPCsAndRagdolls, EntityFilterTwo(self, self:GetActiveWeapon()) )
-
-    if isValidTraceFunc(self, trace) then
-        return trace.entity
-    end
-
-    // Found nothing
-    return nil
-
-end
-
-function MarineActionFinderMixin:FindWeaponTarget()
-
-    return self:TraceForActionTargets(
-            function(player, trace)
-                return trace.fraction < 1 and trace.entity and HasMixin(trace.entity, "Pickupable")
-                and trace.entity:isa("Weapon") and trace.entity:GetIsValidRecipient(self)
-            end)
-
-end
-
-function MarineActionFinderMixin:FindDismantleTarget()
-
-    return self:TraceForActionTargets(
-        function(player, trace)
-            local e = trace.entity
-            return e and HasMixin(e, "Digest") and e:GetCanDigest(self)
-        end)
-
+function MarineActionFinderMixin:GetNearbyPickupableWeapon()
+    return FindNearbyWeapon(self, self:GetOrigin())
 end
 
 if Client then
-
-    function MarineActionFinderMixin:GetOutlinedEntity()
-        return self.weaponTarget or self.useTarget
-    end
 
     function MarineActionFinderMixin:OnProcessMove(input)
     
         PROFILE("MarineActionFinderMixin:OnProcessMove")
         
-        local actionsAllowed = GetGamerules():GetIsMarinePrepTime()
+        local gameStarted = true --TODO Don't file replace
         local prediction = Shared.GetIsRunningPrediction()
         local now = Shared.GetTime()
         local enoughTimePassed = (now - self.lastMarineActionFindTime) >= kIconUpdateRate
-
         if not prediction and enoughTimePassed then
-
-            // handle visuals for dropping/using targeting
         
             self.lastMarineActionFindTime = now
             
-            local showIcon = false
-            self.weaponTarget = nil
-            self.useTarget = nil
+            local success = false
             
-            if actionsAllowed and self:GetIsAlive() and not GetIsVortexed(self) then
+            if self:GetIsAlive() and not GetIsVortexed(self) then
             
-                self.weaponTarget = self:FindWeaponTarget()
-
-                if self.weaponTarget then
+                local foundNearbyWeapon = FindNearbyWeapon(self, self:GetOrigin())
+                if gameStarted and foundNearbyWeapon then
                 
-                    self.actionIconGUI:ShowIcon(BindingsUI_GetInputValue("Use"), self.weaponTarget:GetClassName(), self.weaponTarget:GetClassName())
-                    showIcon = true
+                    self.actionIconGUI:ShowIcon(BindingsUI_GetInputValue("Drop"), foundNearbyWeapon:GetClassName(), nil)
+                    success = true
                     
                 else
                 
-                    self.useTarget = self:PerformUseTrace()
-
-                    if self.useTarget and GetPlayerCanUseEntity(self, self.useTarget) and not self:GetIsUsing() then
+                    local ent = self:PerformUseTrace()
+                    if ent and (gameStarted or (ent.GetUseAllowedBeforeGameStart and ent:GetUseAllowedBeforeGameStart())) then
+                    
+                        if GetPlayerCanUseEntity(self, ent) and not self:GetIsUsing() then
                         
-                        self.actionIconGUI:ShowIcon(BindingsUI_GetInputValue("Use"), nil, self.useTarget:GetClassName())
-                        showIcon = true
-                        
-                    end
-
-                    // Try 
-                    if not self.useTarget then
-
-                        local target = self:FindDismantleTarget()
-
-                        if target then
-                            digestFraction = target:GetDigestFraction()
-                            self.actionIconGUI:ShowIcon(BindingsUI_GetInputValue("Use"), nil, "Dismantle", digestFraction)
-                            self.useTarget = target
-                            showIcon = true
+                            local hintText = nil
+                            if ent:isa("CommandStation") and ent:GetIsBuilt() then
+                                hintText = gameStarted and "START_COMMANDING" or "START_GAME"
+                            end
+                            
+                            self.actionIconGUI:ShowIcon(BindingsUI_GetInputValue("Use"), nil, hintText, nil)
+                            success = true
+                            
                         end
-
+                        
                     end
                     
                 end
                 
             end
             
-            if not showIcon then
+            if not success then
                 self.actionIconGUI:Hide()
             end
             

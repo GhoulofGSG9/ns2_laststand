@@ -17,11 +17,12 @@ end
 
 function Class_ReplaceMethod(className, methodName, method)
 
-	local original = _G[className][methodName]
-	assert(original ~= nil)
+	local original = _G[className] and _G[className][methodName]
 
-	ReplaceMethodInDerivedClasses(className, methodName, method, original)
-	return original
+	if original then
+		ReplaceMethodInDerivedClasses(className, methodName, method, original)
+		return original
+	end
 
 end
 
@@ -110,4 +111,45 @@ function Class_Reload(className, networkVars)
     // dont delete old network vars, simply replace them if their type has changed or add them if new
     Shared.LinkClassToMap(className, nil, networkVars)
 
+end
+
+-- Pass in a function and a table of local variables (Lua "upvalues") used in that
+-- function and these variables will be replaced.
+-- Example: ReplaceLocals(Player.GetJumpHeight, { kMaxHeight = 10 })
+-- This example assumed a local variable with the name kMaxHeight is referenced
+-- from inside the Player:GetJumpHeight() function.
+function ReplaceLocals(originalFunction, replacedLocals)
+
+    local numReplaced = 0
+    for name, value in pairs(replacedLocals) do
+    
+        local index = 1
+        local foundIndex = nil
+        while true do
+        
+            local n, v = debug.getupvalue(originalFunction, index)
+            if not n then
+                break
+            end
+            
+            -- Find the highest index matching the name.
+            if n == name then
+                foundIndex = index
+            end
+            
+            index = index + 1
+            
+        end
+        
+        if foundIndex then
+        
+            debug.setupvalue(originalFunction, foundIndex, value)
+            numReplaced = numReplaced + 1
+            
+        end
+        
+    end
+    
+    return numReplaced
+    
 end
