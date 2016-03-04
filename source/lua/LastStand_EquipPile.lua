@@ -74,7 +74,7 @@ function EquipPile:Spew()
 
         local numPlayer = Server.GetNumPlayersTotal()
         local num = math.max(math.round(numPlayer / Shared.GetEntitiesWithClassname("EquipPile"):GetSize()), 1)
-        self:SpewFrom( self:GetDropTechIds(), numPlayer)
+        self:SpewFrom( self:GetDropTechIds(), num)
 
     end
 
