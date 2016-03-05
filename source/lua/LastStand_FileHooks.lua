@@ -37,9 +37,9 @@ ModLoader.SetupFileHook( "lua/Balance.lua", "lua/LastStand_Balance.lua", "post" 
 
 ModLoader.SetupFileHook( "lua/GUIMinimapFrame.lua", "lua/LastStand_GUIMinimapFrame.lua", "post" )
 ModLoader.SetupFileHook( "lua/GUIFirstPersonSpectate.lua", "lua/LastStand_GUIFirstPersonSpectate.lua", "post" )
+ModLoader.SetupFileHook( "lua/GUIScoreboard.lua", "lua/LastStand_GUIScoreboard.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/GUIInsight_TopBar.lua", "lua/LastStand_GUIInsight_TopBar.lua", "replace" )
-ModLoader.SetupFileHook( "lua/GUIScoreboard.lua", "lua/LastStand_GUIScoreboard.lua", "replace" )
 
 --Block all not needed Vanilla Files here
 local kBlockedFiles ={ 
