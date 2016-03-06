@@ -16,7 +16,7 @@ local kLastStandMaps = {
 	{
 		map = "ns2_ls_frost",
 		mods = {
-			"25E6451E",
+			"261A4B61",
 			modId
 		}
 	},
@@ -44,21 +44,14 @@ local kLastStandMaps = {
 	{
 		map = "ns2_ls_storm",
 		mods = {
-			"25e95d38",
-			modId
-		}
-	},
-	{
-		map = "ns2_ls_storm",
-		mods = {
-			"2357C84A",
+			"261A4B61",
 			modId
 		}
 	},
 	{
 		map = "ns2_ls_eclipse",
 		mods = {
-			"2607a0db",
+			"261A4B61",
 			modId
 		}
 	}
@@ -108,7 +101,7 @@ function MapCycle_AddMaps(maps)
 	MapCycle_SetMapCycle(cycle)
 end
 
---We keep the serevr's map cycle up to date if the checkmapcycle option is set true
+--We keep the server's map cycle up to date if the checkmapcycle option is set true
 do
 	if config.checkmapcycle then
 		Shared.Message("Updating Last Stand Maps ...")
