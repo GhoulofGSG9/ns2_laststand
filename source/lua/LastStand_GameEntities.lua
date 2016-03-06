@@ -1,19 +1,15 @@
-gAlienSpawn = nil
+gAlienSpawns = {}
 class 'AlienSpawn' (ScriptActor)
 
 local networkVars = { }
 AddMixinNetworkVars(InfestationMixin, networkVars)
 
-function AlienSpawn:OnCreate()
-    ScriptActor.OnCreate(self)
-    gAlienSpawn = self
-end
-
 function AlienSpawn:OnInitialized()
     ScriptActor.OnInitialized(self)
     InitMixin(self, InfestationMixin)
     self:SetInfestationFullyGrown()
-    gAlienSpawn = self
+
+    table.insert(gAlienSpawns, self)
     
     if Server then
         table.insert( gGameEventListeners, self )

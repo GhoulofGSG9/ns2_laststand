@@ -14,11 +14,16 @@ function AlienTeam:GetBioMassLevel()
 end
 
 function AlienTeam:GetSpawnPosition()
-    return gAlienSpawn:GetOrigin()
+    local spawn = gAlienSpawns[math.random(#gAlienSpawns)]
+    return spawn:GetOrigin()
+end
+
+function AlienTeam:GetSpawn()
+    return gAlienSpawns and gAlienSpawns[math.random(#gAlienSpawns)]
 end
 
 function AlienTeam:GetSpawnAngles()
-    return gAlienSpawn:GetAngles()
+    return gAlienSpawn[1]:GetAngles()
 end
 
 function AlienTeam:GetActiveHiveCount()

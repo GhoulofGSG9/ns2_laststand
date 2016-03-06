@@ -14,8 +14,10 @@ end
 function AlienSpectator:SpawnPlayer()
 
     local team = self:GetTeam()
-    local spawnOrigin = GetGroundAtPosition(team:GetSpawnPosition(), nil, PhysicsMask.AllButPCs)
-    local spawnAngles = team:GetSpawnAngles()
+    local spawn = team:GetSpawn()
+
+    local spawnOrigin = GetGroundAtPosition(spawn:GetOrigin(), nil, PhysicsMask.AllButPCs)
+    local spawnAngles = spawn:GetAngles()
 
     local spawnClass = LookupTechData(kTechId.Skulk, kTechDataMapName)
     local _, player = team:ReplaceRespawnPlayer(self, spawnOrigin, spawnAngles, spawnClass, false)
