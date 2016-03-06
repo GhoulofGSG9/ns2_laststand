@@ -16,6 +16,12 @@
 
 	<class name="ls_exo">
 		<model><file>models/marine/exosuit/exosuit_cm.model</file></model>
+		
+		<parameter name="exoType" type="choice" label="Exotype to spawn" help="Determines what type of exosuit will spawn" default="1">
+            <choice label="Random" value="1"/>
+            <choice label="DualMinigun" value="2"/>
+            <choice label="DualRailgun" value="3"/>
+        </parameter>
 	</class>
 
 	<class name="ls_alien_spawn">

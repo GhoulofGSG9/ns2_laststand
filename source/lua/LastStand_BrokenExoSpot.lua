@@ -25,11 +25,11 @@ function BrokenExoSpot:OnPreGameStart()
     local origin = coords.origin
     origin = GetGroundAtPosition(origin, nil, PhysicsMask.AllButPCs)
 
-    -- randomly choose
-    local randomLayout = kLayouts[(math.random(1, #kLayouts))]
+    local choice = (self.exoType == nil or self.exoType == 1) and math.random(1, #kLayouts) or self.exoType - 1
+    local layout = kLayouts[choice]
     local exo = CreateEntity(Exosuit.kMapName, origin, 1)
     exo:SetCoords(coords)
-    exo:SetLayout(randomLayout)
+    exo:SetLayout(layout)
 
 end
 
