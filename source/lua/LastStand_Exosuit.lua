@@ -20,7 +20,7 @@ function Exosuit:OnInitialized()
         damagedCinematic:SetCinematic(kDamagedCinematic)
         damagedCinematic:SetRepeatStyle(Cinematic.Repeat_Endless)
         damagedCinematic:SetCoords(coords)
-        --damagedCinematic:SetAttachPoint(self:GetAttachPointIndex(kFlaresAttachpoint))
+        damagedCinematic:SetAttachPoint(self:GetAttachPointIndex(kFlaresAttachpoint))
         damagedCinematic:SetIsVisible(true)
         
     end
