@@ -73,28 +73,53 @@ local function GetMapName(map)
 
 end
 
-function MapCycle_GetMapInCycle(mapname)
-	local cycle = MapCycle_GetMapCycle()
-
+local function GetMapInCycle(mapname, cycle)
 	for m = 1, #cycle.maps do
-
 		local map = cycle.maps[m]
-		if GetMapName(map) == mapName then
+		if GetMapName(map) == mapname then
 			return map, m
 		end
 
 	end
 end
 
+--We messed up, so we have to clean up our mess
+local function CleanUp(mapName, cycle)
+
+	local found = false
+	local foundIndexes = {}
+
+	for m = 1, #cycle.maps do
+
+		local entry = cycle.maps[m]
+		if GetMapName(entry) == mapName then
+			if not found then
+				found = true
+			else
+				table.insert(foundIndexes, 1, m)
+			end
+		end
+	end
+
+	for _, index in ipairs(foundIndexes) do
+		table.remove(cycle.maps, index)
+	end
+
+	return cycle
+end
+
 function MapCycle_AddMaps(maps)
 	local cycle = MapCycle_GetMapCycle()
 
 	for _, entry in ipairs(maps) do
-		local mapentry, index = MapCycle_GetMapInCycle(entry.map)
+		cycle = CleanUp(entry.map, cycle)
+
+		local mapentry, index = GetMapInCycle(entry.map, cycle)
 		if not mapentry then
 			table.insert(cycle.maps, entry)
 		else
-			cycle.maps[index] = entry
+			mapentry.mods = entry.mods
+			cycle.maps[index] = mapentry
 		end
 	end
 
