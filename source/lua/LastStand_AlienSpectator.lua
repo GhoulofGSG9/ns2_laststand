@@ -7,16 +7,15 @@ function AlienSpectator:OnInitialized()
 
 end
 
-function AlienSpectator:GetIsOverhead()
-	return false
-end
-
 function AlienSpectator:SpawnPlayer()
 
     local team = self:GetTeam()
     local spawn = team:GetSpawn()
 
-    local spawnOrigin = GetGroundAtPosition(spawn:GetOrigin(), nil, PhysicsMask.AllButPCs)
+    local extents = LookupTechData(kTechId.Skulk, kTechDataMaxExtents, nil)
+    local capsuleHeight, capsuleRadius = GetTraceCapsuleFromExtents(extents)
+
+    local spawnOrigin = GetRandomSpawnForCapsule(capsuleHeight, capsuleRadius, spawn:GetOrigin(), 0.5, 6, EntityFilterAll())
     local spawnAngles = spawn:GetAngles()
 
     local spawnClass = LookupTechData(kTechId.Skulk, kTechDataMapName)
@@ -25,9 +24,6 @@ function AlienSpectator:SpawnPlayer()
     player:SetHUDSlotActive(1)
     player:UpdateArmorAmount()
     player:SetCameraDistance(0)
-    --It is important that the player was spawned at the spot we specified.
-    assert(player:GetOrigin() == spawnOrigin)   
-    
 end
 
 function AlienSpectator:OnProcessMove(input)
@@ -50,10 +46,6 @@ function AlienSpectator:OnProcessMove(input)
         
     end
     
-end
-
-function AlienSpectator:GetIsValidTarget()
-    return false
 end
 
 Class_Reload("AlienSpectator", networkVars)
