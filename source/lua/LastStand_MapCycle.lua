@@ -84,36 +84,34 @@ local function GetMapInCycle(mapname, cycle)
 end
 
 --We messed up, so we have to clean up our mess
-local function CleanUp(mapName, cycle)
+local function RemoveDuplicatedMaps()
+	local cycle = MapCycle_GetMapCycle()
 
-	local found = false
-	local foundIndexes = {}
+	local changed = false
+	local found = {}
 
-	for m = 1, #cycle.maps do
+	local newCycle = cycle
+	newCycle.maps = {}
 
-		local entry = cycle.maps[m]
-		if GetMapName(entry) == mapName then
-			if not found then
-				found = true
-			else
-				table.insert(foundIndexes, 1, m)
-			end
+	 for _, entry in ipairs(cycle.maps) do
+
+		if not found[GetMapName(entry)] then
+			found[GetMapName(entry)] = true
+			table.insert(newCycle.maps, entry)
+		else
+			changed = true
 		end
 	end
 
-	for _, index in ipairs(foundIndexes) do
-		table.remove(cycle.maps, index)
+	if changed then
+		MapCycle_SetMapCycle(cycle)
 	end
-
-	return cycle
 end
 
 function MapCycle_AddMaps(maps)
 	local cycle = MapCycle_GetMapCycle()
 
 	for _, entry in ipairs(maps) do
-		cycle = CleanUp(entry.map, cycle)
-
 		local mapentry, index = GetMapInCycle(entry.map, cycle)
 		if not mapentry then
 			table.insert(cycle.maps, entry)
@@ -130,6 +128,7 @@ end
 do
 	if config.checkmapcycle then
 		Shared.Message("Updating Last Stand Maps ...")
+		RemoveDuplicatedMaps()
 		MapCycle_AddMaps(kLastStandMaps)
 	end
 end
