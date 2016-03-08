@@ -1,2 +1,2 @@
 Embryo.gFastEvolveCheat = true
-kLastStandVersion = 1.0
+kLastStandVersion = 1.1
