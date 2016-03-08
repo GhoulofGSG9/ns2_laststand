@@ -7,6 +7,10 @@ function AlienSpectator:OnInitialized()
 
 end
 
+function AlienSpectator:GetIsOverhead()
+	return false
+end
+
 function AlienSpectator:SpawnPlayer()
 
     local team = self:GetTeam()
@@ -46,6 +50,10 @@ function AlienSpectator:OnProcessMove(input)
         
     end
     
+end
+
+function AlienSpectator:GetIsValidTarget()
+    return false
 end
 
 Class_Reload("AlienSpectator", networkVars)
