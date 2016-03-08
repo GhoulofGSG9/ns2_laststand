@@ -275,7 +275,7 @@ if Server then
             self.sponitor:Update(timePassed)
             self.gameInfo:SetIsGatherReady(Server.GetIsGatherReady())
             self:UpdateWave()
-            --self:UpdateSounds(timePassed)
+            self:UpdateSounds(timePassed)
             
         end
         
