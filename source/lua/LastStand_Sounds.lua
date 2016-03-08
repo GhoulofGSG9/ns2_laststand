@@ -1,6 +1,6 @@
 kCommonSounds =
 { 
-    --RoundEndMusic = "sound/ls.fev/music/RoundEnd",
+    RoundEndMusic = "sound/ls.fev/music/RoundEnd",
     LoadingMusic = "sound/NS2.fev/common/loading",
 }
 
