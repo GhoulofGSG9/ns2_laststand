@@ -78,7 +78,7 @@
 <notes></notes>
 <entrylistmode>1</entrylistmode>
 <waveform>
-<filename>last_stand/round_end.mp3</filename>
+<filename>last_stand/round_end.wav</filename>
 <soundbankname>ls</soundbankname>
 <weight>100</weight>
 <percentagelocked>0</percentagelocked>
@@ -117,7 +117,7 @@
 <notes></notes>
 <entrylistmode>1</entrylistmode>
 <waveform>
-<filename>last_stand/thunderstorm.mp3</filename>
+<filename>last_stand/thunderstorm.wav</filename>
 <soundbankname>ls</soundbankname>
 <weight>100</weight>
 <percentagelocked>0</percentagelocked>
@@ -647,8 +647,8 @@
 <_BB10_banktype>DecompressedSample</_BB10_banktype>
 <notes></notes>
 <waveform>
-<filename>last_stand/round_end.mp3</filename>
-<guid>{0ae535c5-7b7e-4b67-8c40-a84eed47472f}</guid>
+<filename>last_stand/round_end.wav</filename>
+<guid>{68157f42-1481-4279-99a7-c6261dbc334f}</guid>
 <mindistance>1</mindistance>
 <maxdistance>10000</maxdistance>
 <deffreq>44100</deffreq>
@@ -701,8 +701,8 @@
 <notes></notes>
 </waveform>
 <waveform>
-<filename>last_stand/thunderstorm.mp3</filename>
-<guid>{097fdb53-c959-46a3-9381-915009b3a504}</guid>
+<filename>last_stand/thunderstorm.wav</filename>
+<guid>{189c68e5-ac4a-4bd5-a79a-9c6229376ec3}</guid>
 <mindistance>1</mindistance>
 <maxdistance>10000</maxdistance>
 <deffreq>44100</deffreq>
@@ -807,7 +807,7 @@
 <_BB10_forcesoftware>0</_BB10_forcesoftware>
 <_BB10_maxstreams>10</_BB10_maxstreams>
 <_lang_default_filename_prefix></_lang_default_filename_prefix>
-<_lang_default_rebuild>0</_lang_default_rebuild>
+<_lang_default_rebuild>1</_lang_default_rebuild>
 </soundbank>
 <notes></notes>
 <currentplatform>PC</currentplatform>
