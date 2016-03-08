@@ -37,6 +37,10 @@ function EquipPile:OnCreate()
     InitMixin(self, BaseModelMixin)
     InitMixin(self, ModelMixin)
 
+    self.dropSentries = self.dropSentries or true
+    self.dropCatpacks = self.dropCatpacks or true
+    self.dropJetpacks = self.dropJetpacks or true
+
 end
 
 function EquipPile:SpewFrom(techIds, count)
@@ -59,34 +63,51 @@ function EquipPile:SpewFrom(techIds, count)
 
 end
 
-function EquipPile:GetDropTechIds()
-    return
-    {
-        kTechId.DropJetpack,
-        kTechId.DropJetpack,
-        kTechId.DropSentry,
-    }
+function EquipPile:SpewJetpack()
+    if not self.dropJetpacks then return end
+
+    local numPlayer = Server.GetNumPlayersTotal() / 2
+    local num = math.max(math.round(numPlayer / #gEquipPiles), 1)
+
+    for i = 1, num do
+        if math.random() <= kJetpackDropChance then
+            self:SpewFrom({kTechId.DropJetpack}, num)
+            return true
+        end
+    end
 end
 
-function EquipPile:Spew()
+function EquipPile:SpewSentries()
+    if not self.dropSentries then return end
 
-    if Server then
+    local numPlayer = Server.GetNumPlayersTotal() / 2
+    local num = math.max(math.round(numPlayer / #gEquipPiles), 1)
 
-        local numPlayer = Server.GetNumPlayersTotal()
-        local num = math.max(math.round(numPlayer / Shared.GetEntitiesWithClassname("EquipPile"):GetSize()), 1)
-        self:SpewFrom( self:GetDropTechIds(), num)
-
+    for i = 1, num do
+        if math.random() <= kSentryDropChance then
+            self:SpewFrom({kTechId.DropSentry}, num)
+            return true
+        end
     end
-
 end
 
 function EquipPile:SpewCat()
+    if not self.dropCatpacks then return end
+
     local numMarines = GetGamerules():GetNumMarinePlayers()
-    self:SpewFrom({kTechId.DropCatPack}, numMarines)
+    local numCatpacks = #GetEntitiesWithinRangeAreVisible("CatPack", self:GetOrigin(), 6, true)
+    local num = math.max(math.round(numMarines / #gEquipPiles), 1) - numCatpacks
+
+    self:SpewFrom({kTechId.DropCatPack}, num)
 end
 
 function EquipPile:OnPreGameStart()
-    self:Spew()
+
+    if math.random() > 0.5 and self.dropJetpacks then
+        self:SpewJetpack()
+    else
+        self:SpewSentries()
+    end
 end
 
 function EquipPile:OnUpdate()

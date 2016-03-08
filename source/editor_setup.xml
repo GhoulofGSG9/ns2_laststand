@@ -4,6 +4,10 @@
     <!-- Last Stand -->
 	<class name="ls_equip_pile">
 		<model><file>models/last_stand/marine/marine_crate_02.model</file></model>
+
+        <parameter name="dropSentries" type="boolean" label="Drop Sentries?" help="Determines if this pile drops sentries or not" default="true"/>
+        <parameter name="dropJetpacks" type="boolean" label="Drop Jetpacks?" help="Determines if this pile drops jetpacks or not" default="true"/>
+        <parameter name="dropCatpacks" type="boolean" label="Drop Catpacks?" help="Determines if this pile drops catpacks or not" default="true"/>
 	</class>
 
 	<class name="ls_meds_pile">

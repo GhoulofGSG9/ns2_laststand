@@ -25,3 +25,7 @@ kGorgeUpgradeCost = 1
 kLerkUpgradeCost = 3
 kFadeUpgradeCost = 5
 kOnosUpgradeCost = 8
+
+--Dropchances
+kSentryDropChance = 1/3
+kJetpackDropChance = 2/3
