@@ -1,9 +1,19 @@
-name        = "Last Stand"
+name        = "Last Stand Spotlight"
 source_dir  = "source"
 output_dir  = "output"
-description = [=[This is the Last Stand mod made by UWE during the 1-week mod jam. 
-
-As marines, your team must survive for 2.5 minutes. If you die, you are out until the round is over. If at least 1 Marine is left standing, marines win. 
-
-As aliens, your goal is to eliminate all marines. You respawn infinitely and can choose from three lifeform variants each spawn. As the round progresses, you will have access to more powerful variants.]=]
+description = [=[The Kharra horde continues their push into the galaxy. The TSF are overrun. 
+
+Only a few survive to face the Last Stand.
+
+Last Stand is a fast-paced twitch-shooter gamemode. There is no commander, only you, your skill, and your friends. 
+
+Play as either Alien or Marine in a final showdown on over 6 new maps. 
+
+Designed with low player counts in mind, play all the way up to 24 players and win the fight for glory.
+
+For server operators:
+[url=https://gist.github.com/GhoulofGSG9/e630e4b5670f000c7c06]Example of a Last Stand MapCycle.json[/url]
+
+Source Code and Issue Tracker:
+https://github.com/GhoulofGSG9/ns2_laststand]=]
 image       = "preview.jpg"
