@@ -10,7 +10,7 @@ kShotgunCost = 20
 kClusterGrenadeCost = 3
 kGasGrenadeCost = 3
 kPulseGrenadeCost = 3
-kMineCost = 10
+kMineCost = 20
 kFlamethrowerCost = 15
 kGrenadeLauncherCost = 20
 
