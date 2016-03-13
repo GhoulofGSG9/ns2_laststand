@@ -9,10 +9,10 @@ Last Stand is intended to trim *Natural Selection 2* down to a faced-paced shoot
 
 In that matter all commander or other strategical game elements have been removed.
 
-Marine's only objective is to survive a short amount of time while aliens try to kill all marines in given time.
+Marine's only objective is to survive a short amount of time while the alien player try to kill all marines in given time.
 
 Marines start fully upgraded with the possibility to buy/gather extra equipment before the round starts.
 
-Alien start with their basic life form and get more resources to evolve into higher lifeforms as the round processes.
+Aliens start with their basic life form and get more resources to evolve into higher lifeforms as the round processes.
 
 
