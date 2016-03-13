@@ -102,12 +102,8 @@ function EquipPile:SpewCat()
 end
 
 function EquipPile:OnPreGameStart()
-
-    if math.random() > 0.5 and self.dropJetpacks then
-        self:SpewJetpack()
-    else
-        self:SpewSentries()
-    end
+    self:SpewJetpack()
+    self:SpewSentries()
 end
 
 function EquipPile:OnUpdate()
