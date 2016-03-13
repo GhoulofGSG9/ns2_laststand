@@ -30,6 +30,8 @@
 
 	<class name="ls_alien_spawn">
         <model><file>models/alien/egg/egg.model</file></model>
+
+        <parameter name="spawnInfestation" type="boolean" label="Spawn Infestation?" help="Determines if this spawn spreads Infestation" default="true"/>
     </class>
 
 	<class name="ls_marine_spawn">

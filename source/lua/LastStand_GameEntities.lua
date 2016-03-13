@@ -6,8 +6,11 @@ AddMixinNetworkVars(InfestationMixin, networkVars)
 
 function AlienSpawn:OnInitialized()
     ScriptActor.OnInitialized(self)
-    InitMixin(self, InfestationMixin)
-    self:SetInfestationFullyGrown()
+
+    if self.spawnInfestation ~= false then
+        InitMixin(self, InfestationMixin)
+        self:SetInfestationFullyGrown()
+    end
 
     table.insert(gAlienSpawns, self)
     
