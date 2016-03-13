@@ -54,6 +54,20 @@ local kLastStandMaps = {
 			"261A4B61",
 			modId
 		}
+	},
+	{
+		map = "ns2_ls_traction",
+		mods = {
+			"2655cd48",
+			modId
+		}
+	},
+	{
+		map = "ns2_ls_troopers",
+		mods = {
+			"261A4B61",
+			modId
+		}
 	}
 }
 
