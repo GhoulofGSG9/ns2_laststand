@@ -82,11 +82,10 @@ function GUIRoundTime:Update(dt)
 	if gameState == kGameState.PreGame then
 		timeLeft = math.max( 0, timeLeft - dt)
         if timeLeft < 10 then
-            self.timeText:SetText(string.format("MARINE PREP TIME LEFT %0.2f", timeLeft))
+            self.timeText:SetText(string.format("%s %0.2f", Locale.ResolveString("MARINE_PREP_TIME_LEFT"), timeLeft))
         else
-            self.timeText:SetText(string.format("MARINE PREP TIME LEFT %d", timeLeft))
+            self.timeText:SetText(string.format("%s %d", Locale.ResolveString("MARINE_PREP_TIME_LEFT"), timeLeft))
         end
-        --TODO: Translate
         self.timeText:SetColor( Color(1,1,0,1) )
         self:SetWidgetSize(250, nil)
 

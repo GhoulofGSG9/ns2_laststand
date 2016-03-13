@@ -58,7 +58,6 @@ kTeamMessages[kTeamMessageTypes.TeamsBalanced] = { text = { [kMarineTeamType] = 
 kTeamMessages[kTeamMessageTypes.GameStartCommanders] = { text = { [kMarineTeamType] = "GAME_START_COMMANDERS", [kAlienTeamType] = "GAME_START_COMMANDERS" } }
 
 kTeamMessages[kTeamMessageTypes.ReturnToBase] = { text = { [kMarineTeamType] = "RETURN_TO_BASE", [kAlienTeamType] = "RETURN_TO_BASE" } }
---TODO: Translate
 
 -- Silly name but it fits the convention.
 local kTeamMessageMessage =

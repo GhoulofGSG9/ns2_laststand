@@ -11,10 +11,9 @@ originalHUDUpdate = Class_ReplaceMethod( "GUIAlienSpectatorHUD", "Update", funct
 		
 		local gamestate = GetGameInfoEntity():GetState()
 		if gamestate == kGameState.NotStarted then
-			--TODO: Translate
-			self.spawnText:SetText("Waiting for a player to join the Marine team") --Locale.ResolveString("WAITING_FOR_ONE_MARINE")
+			self.spawnText:SetText(Locale.ResolveString("WAITING_FOR_ONE_MARINE"))
 		elseif gamestate == kGameState.PreGame then
-			self.spawnText:SetText("Spawning as soon as Marines are prepared!") 
+			self.spawnText:SetText(Locale.ResolveString("WAITING_FOR_PREP_MARINES"))
         else
             self.spawnText:SetText(Locale.ResolveString("WAITING_TO_SPAWN"))
         end

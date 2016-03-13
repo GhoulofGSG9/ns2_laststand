@@ -115,9 +115,9 @@ function LastStand_BaseProtector:OnTriggerEntered(enterEnt)
         if self.enabled and not GetDamageOverTimeIsEnabled(self) then
             KillEntity(self, enterEnt)
         elseif GetTeamProtecting(self) == teamProtectingType.Alien and (enterEnt:isa("Marine") or enterEnt:isa("Exo")) then
-            SendTeamMessage(enterEnt:GetTeam(), kTeamMessageTypes.ReturnToBase)
+	        SendPlayersMessage({enterEnt}, kTeamMessageTypes.ReturnToBase)
         elseif GetTeamProtecting(self) == teamProtectingType.Marine and enterEnt:isa("Alien") then
-            SendTeamMessage(enterEnt:GetTeam(), kTeamMessageTypes.ReturnToBase)
+	        SendPlayersMessage({enterEnt}, kTeamMessageTypes.ReturnToBase)
         end
     end
     
