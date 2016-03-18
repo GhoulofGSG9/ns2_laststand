@@ -100,18 +100,16 @@ end
 --We messed up, so we have to clean up our mess
 local function RemoveDuplicatedMaps()
 	local cycle = MapCycle_GetMapCycle()
+    local oldMaps = cycle.maps
 
 	local changed = false
 	local found = {}
 
-	local newCycle = cycle
-	newCycle.maps = {}
-
-	 for _, entry in ipairs(cycle.maps) do
-
+    cycle.maps = {}
+	for _, entry in ipairs(oldMaps) do
 		if not found[GetMapName(entry)] then
 			found[GetMapName(entry)] = true
-			table.insert(newCycle.maps, entry)
+			table.insert(cycle.maps, entry)
 		else
 			changed = true
 		end
