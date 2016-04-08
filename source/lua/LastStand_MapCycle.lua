@@ -61,14 +61,11 @@ local kLastStandMaps = {
 			"2655cd48",
 			modId
 		}
-	},
-	{
-		map = "ns2_ls_troopers",
-		mods = {
-			"261A4B61",
-			modId
-		}
 	}
+}
+
+local kRemoveMaps = {
+	"ns2_ls_troopers"
 }
 
 local kLastStandDefaultConfig = {
@@ -136,11 +133,32 @@ function MapCycle_AddMaps(maps)
 	MapCycle_SetMapCycle(cycle)
 end
 
+function MapCycle_RemoveMaps(maps)
+	local cycle = MapCycle_GetMapCycle()
+	local remove = {}
+
+	for _, entry in ipairs(maps) do
+		local mapentry, index = GetMapInCycle(entry, cycle)
+		if mapentry then
+			remove[#remove + 1] = index
+		end
+	end
+
+	if #remove > 0 then
+		for i = #remove, 1 , -1 do
+			table.remove(cycle.maps, remove[i])
+		end
+
+		MapCycle_SetMapCycle(cycle)
+	end
+end
+
 --We keep the server's map cycle up to date if the checkmapcycle option is set true
 do
 	if config.checkmapcycle then
 		Shared.Message("Updating Last Stand Maps ...")
-		RemoveDuplicatedMaps()
+		--RemoveDuplicatedMaps()
+		MapCycle_RemoveMaps(kRemoveMaps)
 		MapCycle_AddMaps(kLastStandMaps)
 	end
 end
