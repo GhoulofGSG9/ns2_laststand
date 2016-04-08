@@ -1,13 +1,12 @@
-
-// ======= Copyright (c) 2003-2011, Unknown Worlds Entertainment, Inc. All rights reserved. =======
-//
-// lua\GUIFeedback.lua
-//
-// Created by: Brian Cronin (brianc@unknownworlds.com)
-//
-// Manages the feedback text.
-//
-// ========= For more information, visit us at http://www.unknownworlds.com =====================
+-- ======= Copyright (c) 2003-2011, Unknown Worlds Entertainment, Inc. All rights reserved. =======
+--
+-- lua\GUIFeedback.lua
+--
+-- Created by: Brian Cronin (brianc@unknownworlds.com)
+--
+-- Manages the feedback text.
+--
+-- ========= For more information, visit us at http://www.unknownworlds.com =====================
 
 class 'GUIFeedback' (GUIScript)
 

@@ -1,13 +1,12 @@
-
-// ======= Copyright (c) 2003-2011, Unknown Worlds Entertainment, Inc. All rights reserved. =======
-//
-// lua\GUIPickups.lua
-//
-// Created by: Brian Cronin (brianc@unknownworlds.com)
-//
-// Manages displaying icons over entities on the ground the local player can pickup.
-//
-// ========= For more information, visit us at http://www.unknownworlds.com =====================
+-- ======= Copyright (c) 2003-2011, Unknown Worlds Entertainment, Inc. All rights reserved. =======
+--
+-- lua\GUIPickups.lua
+--
+-- Created by: Brian Cronin (brianc@unknownworlds.com)
+--
+-- Manages displaying icons over entities on the ground the local player can pickup.
+--
+-- ========= For more information, visit us at http://www.unknownworlds.com =====================
 
 local kPickupsVisibleRange = 15
 
@@ -77,7 +76,7 @@ end
 
 local kMinPickupSize = 16
 local kMaxPickupSize = 48
-// Note: This graphic can probably be smaller as we don't need the icons to be so big.
+-- Note: This graphic can probably be smaller as we don't need the icons to be so big.
 local kIconsTextureName = "ui/drop_icons.dds"
 local kExpireBarTextureName = "ui/healthbarsmall.dds"
 local kIconWorldOffset = Vector(0, 0.5, 0)
@@ -190,7 +189,7 @@ function GUIPickups:Update(deltaTime)
                 local bounceAmount = math.sin(Shared.GetTime() * kBounceSpeed) * kBounceAmount
                 local pickupWorldPosition = pickup:GetOrigin() + kIconWorldOffset + Vector(0, bounceAmount, 0)
                 local pickupInScreenspace = Client.WorldToScreen(pickupWorldPosition)
-                // Adjust for the size so it is in the middle.
+                -- Adjust for the size so it is in the middle.
                 pickupInScreenspace = pickupInScreenspace + Vector(-pickupSize / 2, -pickupSize / 2, 0)
                 freePickupGraphic:SetPosition(Vector(pickupInScreenspace.x, pickupInScreenspace.y-5*distance, 0))
                 freePickupGraphic.expireBar:SetPosition(Vector(pickupInScreenspace.x+1, pickupInScreenspace.y+GUIScale(pickupSize), 0))

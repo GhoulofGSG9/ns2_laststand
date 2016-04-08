@@ -1,10 +1,10 @@
-// ======= Copyright (c) 2003-2011, Unknown Worlds Entertainment, Inc. All rights reserved. =======
-//
-// lua\GUIActionIcon.lua
-//
-// Created by: Brian Cronin (brianc@unknownworlds.com)
-//
-// ========= For more information, visit us at http://www.unknownworlds.com =====================
+-- ======= Copyright (c) 2003-2011, Unknown Worlds Entertainment, Inc. All rights reserved. =======
+--
+-- lua\GUIActionIcon.lua
+--
+-- Created by: Brian Cronin (brianc@unknownworlds.com)
+--
+-- ========= For more information, visit us at http://www.unknownworlds.com =====================
 
 local kIconWidth = 128
 local kIconHeight = 64
@@ -40,7 +40,7 @@ kIconOffsets["LastStand_BuildSentry"] = 9
 local kItemText = { }
 kItemText["Jetpack"] = string.format("Buy Jetpack for %s Resources.", LookupTechData(kTechId.Jetpack, kTechDataCostKey))
 
-// Hold-button progress
+-- Hold-button progress
 local kBarPadding = GUIScale(4)
 local kBarBgSize = Vector(kScaledIconWidth/2, GUIScale(32), 0)
 local kBarSize = Vector(kBarBgSize.x - (2 * kBarPadding), kBarBgSize.y - (2 * kBarPadding), 0)
@@ -130,7 +130,7 @@ function GUIActionIcon:Initialize()
     self.hintText:SetFontName(Fonts.kAgencyFB_Small)
     self.pickupKeyBackground:AddChild(self.hintText)
 
-    // For some things, we need the player to hold the key down for a bit. This displays hold-progress
+    -- For some things, we need the player to hold the key down for a bit. This displays hold-progress
     self.progressBarBg = GUIManager:CreateGraphicItem()
     self.progressBarBg:SetAnchor(GUIItem.Middle, GUIItem.Center)
     self.progressBarBg:SetTexture(kProgressBarTextureName)
@@ -142,7 +142,7 @@ function GUIActionIcon:Initialize()
     self.progressBar:SetInheritsParentAlpha(true)
     self.progressBarBg:AddChild(self.progressBar)
     
-    // so it can say "Hold [E]"
+    -- so it can say "Hold [E]"
     self.holdText = GUIManager:CreateTextItem()
     self.holdText:SetAnchor(GUIItem.Middle, GUIItem.Center)
     self.holdText:SetPosition(Vector(0, 0, 0))
@@ -192,8 +192,8 @@ function GUIActionIcon:SetColor(c)
     self.holdText:SetColor(c)
 end
 
-// Optionally specify text to display before button
-// use holdFraction = nil if this is not a held action
+-- Optionally specify text to display before button
+-- use holdFraction = nil if this is not a held action
 function GUIActionIcon:ShowIcon(buttonText, weaponType, hintText, holdFraction)
 
     PROFILE("GUIActionIcon:ShowIcon")
@@ -201,7 +201,7 @@ function GUIActionIcon:ShowIcon(buttonText, weaponType, hintText, holdFraction)
     self.pickupIcon:SetIsVisible(true)
     self.hintText:SetIsVisible(false)
     
-    // Show no icon if not specified
+    -- Show no icon if not specified
     if weaponType == nil then
         self.pickupIcon:SetColor(Color(1, 1, 1, 0))
         self.pickupText:SetText("")
@@ -236,7 +236,7 @@ function GUIActionIcon:ShowIcon(buttonText, weaponType, hintText, holdFraction)
         self.hintText:SetIsVisible(true)
     end
 
-    // handle hold progress
+    -- handle hold progress
     if holdFraction ~= nil then
         self.progressBarBg:SetIsVisible(true)
         self.progressBar:SetSize( Vector( kBarSize.x*holdFraction, kBarSize.y, 0 ) )
