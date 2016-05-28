@@ -51,6 +51,7 @@ kPickupTextureYOffsets["Jetpack"] = 8
 kPickupTextureYOffsets["LayMines"] = 9
 kPickupTextureYOffsets["Exosuit"] = 10
 kPickupTextureYOffsets["LastStand_BuildSentry"] = 12
+kPickupTextureYOffsets["HeavyMachineGun"] = 13
 --TODO Add a get kPickupTextureYOffsets function to vanilla
 
 local kPickupIconHeight = 64
