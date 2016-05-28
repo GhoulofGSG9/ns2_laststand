@@ -1,3 +1,5 @@
+Script.Load("lua/LastStand_Debug.lua")
+
 if Server then
 
 	local kGamerulesLoaded
@@ -33,6 +35,7 @@ ModLoader.SetupFileHook( "lua/Weapons/Alien/DropStructureAbility.lua", "lua/Weap
 ModLoader.SetupFileHook( "lua/Armory.lua", "lua/LastStand_Armory.lua", "post" )
 ModLoader.SetupFileHook( "lua/PowerConsumerMixin.lua", "lua/LastStand_PowerConsumerMixin.lua", "post" )
 ModLoader.SetupFileHook( "lua/Balance.lua", "lua/LastStand_Balance.lua", "post" )
+ModLoader.SetupFileHook( "lua/MarineActionFinderMixin.lua", "lua/LastStand_MarineActionFinderMixin.lua", "post" )
 
 
 ModLoader.SetupFileHook( "lua/GUIMinimapFrame.lua", "lua/LastStand_GUIMinimapFrame.lua", "post" )

@@ -1,26 +1,6 @@
-local kIconColor = Color(kIconColors[kAlienTeamType])
-
--- first entry is tech id to use if the player has none of the upgrades in the list
-local kIndexToUpgrades =
-{
-    { kTechId.Shell, kTechId.Carapace, kTechId.Regeneration },
-    { kTechId.Spur, kTechId.Celerity, kTechId.Adrenaline },
-    { kTechId.Veil, kTechId.Phantom, kTechId.Aura },
-}
-
-local function GetTechIdToUse(playerUpgrades, categoryUpgrades)
-
-    for i = 1, #categoryUpgrades do
-
-        if table.contains(playerUpgrades, categoryUpgrades[i]) then
-            return categoryUpgrades[i], true
-        end
-
-    end
-
-    return categoryUpgrades[1], false
-
-end
+local GetTechIdToUse = GetUpValue( GUIUpgradeChamberDisplay.Update, "GetTechIdToUse" )
+local kIconColor = GetUpValue( GUIUpgradeChamberDisplay.Update, "kIconColor" )
+local kIndexToUpgrades = GetUpValue( GUIUpgradeChamberDisplay.Update, "kIndexToUpgrades" )
 
 function GUIUpgradeChamberDisplay:Update()
 
