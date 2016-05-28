@@ -26,18 +26,6 @@ function Armory:OnUpdateAnimationInput(modelMixin)
     
 end
 
-function Armory:GetItemList(forPlayer)
-    
-    local itemList = {   
-        kTechId.LayMines,
-        kTechId.Shotgun,
-        kTechId.ClusterGrenade,
-        kTechId.GasGrenade,
-        kTechId.PulseGrenade,
-        kTechId.GrenadeLauncher,
-        kTechId.Flamethrower,
-    }
-
-    return itemList
-    
+function Armory:GetTechId()
+    return kTechId.AdvancedArmory
 end
