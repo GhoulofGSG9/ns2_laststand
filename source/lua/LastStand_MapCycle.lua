@@ -35,13 +35,6 @@ local kLastStandMaps = {
 		}
 	},
 	{
-		map = "ns2_ls_rockdown",
-		mods = {
-			"25E6537D",
-			modId
-		}
-	},
-	{
 		map = "ns2_ls_storm",
 		mods = {
 			"261A4B61",
