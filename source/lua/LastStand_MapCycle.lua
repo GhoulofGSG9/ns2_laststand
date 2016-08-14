@@ -16,7 +16,7 @@ local kLastStandMaps = {
 	{
 		map = "ns2_ls_frost",
 		mods = {
-			"261A4B61",
+			"25E6451E",
 			modId
 		}
 	},

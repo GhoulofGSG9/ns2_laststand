@@ -1,19 +1,14 @@
-name        = "Last Stand Spotlight"
+name        = "Last Stand"
 source_dir  = "source"
 output_dir  = "output"
-description = [=[The Kharra horde continues their push into the galaxy. The TSF are overrun. 
-
-Only a few survive to face the Last Stand.
-
-Last Stand is a fast-paced twitch-shooter gamemode. There is no commander, only you, your skill, and your friends. 
-
-Play as either Alien or Marine in a final showdown on over 6 new maps. 
-
-Designed with low player counts in mind, play all the way up to 24 players and win the fight for glory.
-
-For server operators:
-[url=https://gist.github.com/GhoulofGSG9/e630e4b5670f000c7c06]Example of a Last Stand MapCycle.json[/url]
-
-Source Code and Issue Tracker:
-https://github.com/GhoulofGSG9/ns2_laststand]=]
+description = [=[The Kharra horde continues their push into the galaxy. The TSF are overrun.
+Only a few survive to face the Last Stand.
+Last Stand is a fast-paced twitch-shooter gamemode. There is no commander, only you, your skill, and your friends. 
+Play as either Alien or Marine in a final showdown on over 6 new maps. 
+Designed with low player counts in mind, play all the way up to 24 players and win the fight for glory.
+For server operators:
+[url=https://gist.github.com/GhoulofGSG9/e630e4b5670f000c7c06]Example of a Last Stand MapCycle.json[/url]
+Source Code and Issue Tracker:https://github.com/GhoulofGSG9/ns2_laststand]
 image       = "preview.jpg"
+tag_modtype = "Custom Game Mode"
+tag_support = "Must be run on Server"
