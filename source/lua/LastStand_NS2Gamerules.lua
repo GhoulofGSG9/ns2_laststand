@@ -373,108 +373,126 @@ if Server then
 		end
 	
 		return true        
-    end
-		
+	end
+	
 	function NS2Gamerules:JoinTeam(player, newTeamNumber, force)
 
 		local client = Server.GetOwner(player)
-        if not client then return end
-        
-        local success = false
-        local newPlayer
-        local oldPlayerWasSpectating = client and client:GetSpectatingPlayer()
-        local oldTeamNumber = player:GetTeamNumber()
-		
-		--check if dead marine wants to go to rr
-		if oldTeamNumber == kTeam1Index and oldPlayerWasSpectating and not force and newTeamNumber ~= kSpectatorIndex then
-			return false
-		end
-		
+		if not client then return end
+
+		local success = false
+		local newPlayer
+
+		local oldPlayerWasSpectating = client and client:GetSpectatingPlayer()
+		local oldTeamNumber = player:GetTeamNumber()
+
 		-- Join new team
 		if oldTeamNumber ~= newTeamNumber or force then
-		
+
+			if not Shared.GetCheatsEnabled() and self:GetGameStarted() and newTeamNumber ~= kTeamReadyRoom then
+				player.spawnBlockTime = Shared.GetTime() + kSuicideDelay
+			end
+
 			local team = self:GetTeam(newTeamNumber)
-			local oldTeam = self:GetTeam(player:GetTeamNumber())
-			
+			local oldTeam = self:GetTeam(oldTeamNumber)
+
 			-- Remove the player from the old queue if they happen to be in one
 			if oldTeam then
 				oldTeam:RemovePlayerFromRespawnQueue(player)
 			end
-			
+
 			-- Spawn immediately if going to ready room, game hasn't started, cheats on, or game started recently
 			if newTeamNumber == kTeamReadyRoom then
 
 				newPlayer = player:Replace(LastStand_ReadyRoomPlayer.kMapName, newTeamNumber)
 				success = true
-			
+
 			elseif self:GetCanSpawnImmediately() or force then
-				
+
 				success,newPlayer = team:ReplaceRespawnPlayer(player, nil, nil)
-	  
+
 			else
-			
+
 				-- Destroy the existing player and create a spectator in their place.
 				newPlayer = player:Replace(team:GetSpectatorMapName(), newTeamNumber)
-				
+
 				-- Queue up the spectator for respawn.
 				team:PutPlayerInRespawnQueue(newPlayer)
-				
+
 				success = true
-				
+
 			end
-            
+
+			local clientUserId = client:GetUserId()
+			--Save old pres
+			if oldTeam == self.team1 or oldTeam == self.team2 then
+				if not self.clientpres[clientUserId] then self.clientpres[clientUserId] = {} end
+				self.clientpres[clientUserId][oldTeamNumber] = player:GetResources()
+			end
+
 			-- Update frozen state of player based on the game state and player team.
 			if team == self.team1 or team == self.team2 then
-			
+
 				local devMode = Shared.GetDevMode()
 				local inCountdown = self:GetGameState() == kGameState.Countdown
 				if not devMode and inCountdown then
 					newPlayer.frozen = true
 				end
-				
-			else
-			
-				--Ready room or spectator players should never be frozen
-				newPlayer.frozen = false
-				
-			end
-						
-			newPlayer:TriggerEffects("join_team")
-			
-			if success then
-			
-				self.sponitor:OnJoinTeam(newPlayer, team)
-				local newPlayerClient = newPlayer:GetClient()
 
+				local pres = self.clientpres[clientUserId] and self.clientpres[clientUserId][newTeamNumber]
+				newPlayer:SetResources( pres or ConditionalValue(team == self.team1, kMarineInitialIndivRes, kAlienInitialIndivRes) )
+
+			else
+
+				-- Ready room or spectator players should never be frozen
+				newPlayer.frozen = false
+
+			end
+
+
+			newPlayer:TriggerEffects("join_team")
+
+			if success then
+
+				self.sponitor:OnJoinTeam(newPlayer, team)
+
+				local newPlayerClient = Server.GetOwner(newPlayer)
 				if oldPlayerWasSpectating then
 					newPlayerClient:SetSpectatingPlayer(nil)
 				end
-				
+
 				if newPlayer.OnJoinTeam then
 					newPlayer:OnJoinTeam()
 				end
-				
-				if newTeamNumber == kTeam1Index or newTeamNumber == kTeam2Index then
-					newPlayer:SetEntranceTime()
-				elseif newPlayer:GetEntranceTime() then
-					newPlayer:SetExitTime()
+
+				-- Check if concede sequence is in progress, and if so, set this new player up to
+				-- see it.
+				if GetConcedeSequenceActive() then
+					GetConcedeSequence():AddPlayer(newPlayer)
 				end
-				
+
+				if newTeamNumber == kTeam1Index or newTeamNumber == kTeam2Index then
+					self.playerRanking:SetEntranceTime( newPlayer, newTeamNumber )  --Hive2 added team param
+				elseif oldTeamNumber == kTeam1Index or oldTeamNumber == kTeam2Index then
+					self.playerRanking:SetExitTime( newPlayer, oldTeamNumber ) --Hive2 added team param
+				end
+
 				Server.SendNetworkMessage(newPlayerClient, "SetClientTeamNumber", { teamNumber = newPlayer:GetTeamNumber() }, true)
-                
+
 				if newTeamNumber == kSpectatorIndex then
-                    newPlayer:SetSpectatorMode(kSpectatorMode.Overhead)
-                end
-                
+					newPlayer:SetSpectatorMode(kSpectatorMode.Overhead)
+				end
+
+				self.botTeamController:UpdateBots()
 			end
 
 			return success, newPlayer
-			
+
 		end
-	
-		--Return old player
+
+		-- Return old player
 		return success, player
-	
+
 	end
 	
 	function NS2Gamerules:GetNumMarinePlayers()
