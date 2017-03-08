@@ -315,23 +315,26 @@ if Server then
 
 		PROFILE("NS2Gamerules:CheckGameEnd")
 		
-		if self:GetGameStarted() and not Shared.GetCheatsEnabled() then
+		if self:GetGameStarted() then
 			local marinesLeft = self.team1:GetNumAlivePlayers()
 			if self.marinesLeft ~= marinesLeft then
 				self.gameInfo:SetNumMarinesLeft( marinesLeft )
 				self.marinesLeft = marinesLeft
 			end		
-			
-			if self.marinesLeft == 0 then
 
-				-- all marines gone, lose
-				self:EndGame(self.team2)
+			--don't end the game with cheats enabled
+			if not Shared.GetCheatsEnabled() then
+				if self.marinesLeft == 0 then
 
-			elseif self.gameStartTime + kRoundSecs <= Shared.GetTime() then
+					-- all marines gone, lose
+					self:EndGame(self.team2)
 
-				-- marines survived the time - win!
-				self:EndGame(self.team1)
+				elseif self.gameStartTime + kRoundSecs <= Shared.GetTime() then
 
+					-- marines survived the time - win!
+					self:EndGame(self.team1)
+
+				end
 			end
 		end
 

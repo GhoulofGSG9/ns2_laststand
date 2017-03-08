@@ -97,18 +97,18 @@ function GUIRoundTime:Update(dt)
 			timeLeft = math.max( 0, timeLeft - dt)
             local numMarines = GetGameInfoEntity():GetNumMarinesLeft()
             local wave = math.min(GetGameInfoEntity():GetWave(), 12)
-            local text = string.upper(Pluralize(numMarines, "MARINE"))
+            local text = Pluralize(numMarines, "Marine")
             
             --color
             if timeLeft < 30.0 then
                 self.timeText:SetColor( Color(1,0,0,1) )
-                self.timeText:SetText( string.format("%s - BIOMASS %d - %0.2f", text, wave, timeLeft ) )
+                self.timeText:SetText( string.format("%s - Wave %d - Marine Rescue in %0.2f", text, wave, timeLeft ) )
             else
                 self.timeText:SetColor( kChatTextColor[player:GetTeamType()] )
-                self.timeText:SetText( string.format("%s - BIOMASS %d - %d", text, wave, timeLeft ) )
+                self.timeText:SetText( string.format("%s - Wave %d - Marine Rescue in %d", text, wave, timeLeft ) )
             end
 
-            self:SetWidgetSize(225, nil)
+            self:SetWidgetSize(self.timeText:GetSize().x + 20, nil)
 
         end
 
