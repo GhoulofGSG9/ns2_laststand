@@ -9,7 +9,7 @@ Locale.DefaultLanguage = "enUS"
 
 -- Get all available locale files now, so we don't keep trying to open them later.
 local LangFiles = {}
-Shared.GetMatchingFileNames( "gamestrings/LastStand/*.json", true, LangFiles )
+Shared.GetMatchingFileNames( "locale/LastStand/*.json", false, LangFiles )
 
 local LangLookup = {}
 for i = 1, #LangFiles do
@@ -17,11 +17,12 @@ for i = 1, #LangFiles do
 end
 
 local function ReadFile( Path )
-	local file, err = io.open( Path, "r" )
-	if not file then
-		return nil, err
+	if not GetFileExists(Path) then
+		Shared.Message(string.format("Error: Json file %s could not be found!", Path))
+		return
 	end
 
+	local file = io.open( Path, "r" )
 	local contents = file:read( "*all" )
 	file:close()
 
@@ -38,7 +39,7 @@ local function LoadJSONFile( Path )
 end
 
 function LastStandLocale:ResolveFilePath( Lang )
-	return StringFormat( "gamestrings/LastStand/%s.json", Lang )
+	return StringFormat( "locale/LastStand/%s.json", Lang )
 end
 
 function LastStandLocale:LoadStrings( Lang )

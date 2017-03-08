@@ -283,10 +283,13 @@ if Server then
 	
 	function NS2Gamerules:CheckGameStart(dt)
 		if self:GetGameState() == kGameState.NotStarted then
-			--LastStand_ logic: If there are no ready room players and at least one marine, start already!
-			--Or, if ready time is up
-			if  self.team1:GetNumPlayers() > 0 and self.team2:GetNumPlayers() > 0 or Shared.GetCheatsEnabled() then
+			if self.team1:GetNumPlayers() > 0 and self.team2:GetNumPlayers() > 0 or Shared.GetCheatsEnabled() then
 				self:SetGameState(kGameState.PreGame)
+			elseif self.team1:GetNumPlayers() > 0 then
+				if not self.nextGameStartMessageTime or Shared.GetTime() > self.nextGameStartMessageTime then
+					SendTeamMessage(self.team1, kTeamMessageTypes.NoCommander) --waiting for aliens
+					self.nextGameStartMessageTime = Shared.GetTime() + 10
+				end
 			end
 		elseif self:GetGameState() == kGameState.PreGame then
 			self.lsPreGameSecsLeft = math.max(self.lsPreGameSecsLeft - dt, 0)

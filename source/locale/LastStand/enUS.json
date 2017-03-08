@@ -1,6 +1,6 @@
 {
-  "RETURN_TO_BASE" : "Return to your base!",
   "WAITING_FOR_ONE_MARINE" : "Waiting for a player to join the Marine team",
   "WAITING_FOR_PREP_MARINES" : "Spawning as soon as Marines are prepared!",
+  "NO_COMM" : "The game starts as soon as both teams have at least 1 player!",
   "MARINE_PREP_TIME_LEFT" : "MARINE PREP TIME LEFT"
 }
