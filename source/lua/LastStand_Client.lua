@@ -8,4 +8,3 @@ Event.Hook("LoadComplete", LoadScripts)
 AddClientUIScriptForTeam("all", "GUIRoundTime")
 
 Script.Load("lua/LastStand_HookNetMessages_Client.lua")
-Script.Load("lua/LastStand_Locale.lua")

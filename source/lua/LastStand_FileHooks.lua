@@ -52,3 +52,7 @@ local kBlockedFiles ={
 for _,fileName in ipairs(kBlockedFiles) do
 	ModLoader.SetupFileHook( fileName, "lua/LastStand_FileHooks.lua", "halt" )
 end
+
+if Client then
+	Script.Load("lua/LastStand_Locale.lua")
+end
