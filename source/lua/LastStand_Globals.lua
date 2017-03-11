@@ -1,1 +1,1 @@
-kLastStandVersion = 1.1
+kLastStandVersion = 1.2

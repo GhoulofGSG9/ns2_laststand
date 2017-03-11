@@ -1,5 +1,5 @@
-kPrepareTime = 15
-kRoundTime = 190
+kPrepareTime = 20
+kRoundTime = 180
 kWaveTime = 15
 
 kStartingRes = 20
@@ -10,7 +10,7 @@ kShotgunCost = 20
 kClusterGrenadeCost = 3
 kGasGrenadeCost = 3
 kPulseGrenadeCost = 3
-kMineCost = 20
+kMineCost = 15
 kFlamethrowerCost = 15
 kGrenadeLauncherCost = 20
 
@@ -27,5 +27,5 @@ kFadeUpgradeCost = 5
 kOnosUpgradeCost = 8
 
 --Dropchances
-kSentryDropChance = 1/3
+kSentryDropChance = 1/2
 kJetpackDropChance = 2/3
