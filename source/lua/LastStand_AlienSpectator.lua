@@ -1,10 +1,11 @@
-local alienspectator_oninintialized = AlienSpectator.OnInitialized
 function AlienSpectator:OnInitialized()
+    TeamSpectator.OnInitialized(self)
 
-    alienspectator_oninintialized(self)
-
-    self:SetIsRespawning(true)  
-
+    if Server then
+        local gameInfo = GetGameInfoEntity()
+        self.timeWaveSpawnEnd = gameInfo:GetStartTime() + (gameInfo:GetWave() + 1) * kWaveTime
+        Server.SendNetworkMessage(Server.GetOwner(self), "SetTimeWaveSpawnEnds", { time = self.timeWaveSpawnEnd }, true)
+    end
 end
 
 function AlienSpectator:GetIsOverhead()
@@ -36,15 +37,17 @@ function AlienSpectator:OnProcessMove(input)
     
     if Server then
 
-        local gameState = GetGameInfoEntity():GetState()
-        if gameState == kGameState.Started then
-            self:SpawnPlayer()
-        end
-        
         if not self.waitingToSpawnMessageSent then
 
             SendPlayersMessage({ self }, kTeamMessageTypes.SpawningWait)
             self.waitingToSpawnMessageSent = true
+
+        end
+
+        if not self.sentRespawnMessage then
+
+            Server.SendNetworkMessage(Server.GetOwner(self), "SetIsRespawning", { isRespawning = true }, true)
+            self.sentRespawnMessage = true
 
         end
         

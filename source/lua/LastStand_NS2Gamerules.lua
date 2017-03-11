@@ -302,6 +302,7 @@ if Server then
 			
 			if self.lsPreGameSecsLeft <= 0 then
 				self:SetGameState(kGameState.Started)
+				self:SpawnAllDeadAlien()
 				self.sponitor:OnStartMatch()
 				self.playerRanking:StartGame()
 				self.preventGameEnd = true
@@ -556,6 +557,12 @@ if Server then
         end
     end
 
+	function NS2Gamerules:SpawnAllDeadAlien()
+		for _, player in ientitylist(Shared.GetEntitiesWithClassname("AlienSpectator")) do
+			player:SpawnPlayer()
+		end
+	end
+
     function NS2Gamerules:UpdateWave()
         if self.gameState == kGameState.Started then
             local numWaves = math.ceil(self:GetRoundLength() / kNumSecondsPerWave)
@@ -566,6 +573,8 @@ if Server then
                 for _, player in ientitylist(Shared.GetEntitiesWithClassname("Player")) do
                     player:AddResources(kResPerWave)
                 end
+
+                self:SpawnAllDeadAlien()
 
                 if wave % 3 == 0 then
 	                for _, pile in ientitylist(Shared.GetEntitiesWithClassname("EquipPile")) do
