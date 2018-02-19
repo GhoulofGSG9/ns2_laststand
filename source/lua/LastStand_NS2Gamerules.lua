@@ -6,10 +6,10 @@ local oldWave = 0
 if Server then
     --noinspection GlobalCreationOutsideO
     gGameEventListeners = {}
-	
-	local OldSetGameState =  NS2Gamerules.SetGameState
-	function NS2Gamerules:SetGameState(state)
-		if state ~= self.gameState then
+
+    local OldSetGameState =  NS2Gamerules.SetGameState
+    function NS2Gamerules:SetGameState(state)
+        if state ~= self.gameState then
         
             self.gameState = state
             self.gameInfo:SetState(state)
@@ -19,10 +19,10 @@ if Server then
             local frozenState = (state == kGameState.Countdown) and (not Shared.GetDevMode())
             self.team1:SetFrozenState(frozenState)
             self.team2:SetFrozenState(frozenState)
-			
+
             if self.gameState == kGameState.Started then
-			
-				DestroyLiveMapEntities()
+
+                DestroyLiveMapEntities()
 
                 PostGameViz("Game started")
                 self.gameStartTime = Shared.GetTime()
@@ -37,7 +37,7 @@ if Server then
                         listener:OnGameStart()
                     end
                 end
-				
+
             elseif state == kGameState.PreGame then
                 
                 for _, listener in ipairs(gGameEventListeners) do
@@ -45,7 +45,7 @@ if Server then
                         listener:OnPreGameStart()
                     end
                 end
-				
+
                 --Reset all aliens
                 local aliens = self.team2:GetPlayers()
                 for i = 1, #aliens do
@@ -57,14 +57,14 @@ if Server then
                 end
                 
             else
-				OldSetGameState( self, state )
-			end
-			self:SendTimeLeft()
-		end	
-	end
-	
-	function NS2Gamerules:ResetGame()        
-		TournamentModeOnReset()
+                OldSetGameState( self, state )
+            end
+            self:SendTimeLeft()
+        end
+    end
+
+    function NS2Gamerules:ResetGame()
+        TournamentModeOnReset()
         
         -- Destroy any map entities that are still around
         DestroyLiveMapEntities()
@@ -150,88 +150,11 @@ if Server then
         
         self.team1:OnResetComplete()
         self.team2:OnResetComplete()
-	end
-	
-	--TODO: change those local functions to class functions in vanila ... 
-	local kMaxServerAgeBeforeMapChange = 36000
-    local function ServerAgeCheck(self)
-    
-        if self.gameState ~= kGameState.Started and Shared.GetTime() > kMaxServerAgeBeforeMapChange then
-            MapCycle_ChangeMap(Shared.GetMapName())
-        end
-        
     end
-	
-	local function UpdateAutoTeamBalance(self, dt)
-    
-        local wasDisabled = false
-        
-        -- Check if auto-team balance should be enabled or disabled.
-        local autoTeamBalance = Server.GetConfigSetting("auto_team_balance")
-        if autoTeamBalance then
-        
-            local enabledOnUnbalanceAmount = autoTeamBalance.enabled_on_unbalance_amount or 2
-            -- Prevent the unbalance amount from being 0 or less.
-            enabledOnUnbalanceAmount = enabledOnUnbalanceAmount > 0 and enabledOnUnbalanceAmount or 2
-            local enabledAfterSeconds = autoTeamBalance.enabled_after_seconds or 10
-            
-            local team1Players = self.team1:GetNumPlayers()
-            local team2Players = self.team2:GetNumPlayers()
-            
-            local unbalancedAmount = math.abs(team1Players - team2Players)
-            if unbalancedAmount >= enabledOnUnbalanceAmount then
-            
-                if not self.autoTeamBalanceEnabled then
-                
-                    self.teamsUnbalancedTime = self.teamsUnbalancedTime or 0
-                    self.teamsUnbalancedTime = self.teamsUnbalancedTime + dt
-                    
-                    if self.teamsUnbalancedTime >= enabledAfterSeconds then
-                    
-                        self.autoTeamBalanceEnabled = true
-                        if team1Players > team2Players then
-                            self.team1:SetAutoTeamBalanceEnabled(true, unbalancedAmount)
-                        else
-                            self.team2:SetAutoTeamBalanceEnabled(true, unbalancedAmount)
-                        end
-                        
-                        SendTeamMessage(self.team1, kTeamMessageTypes.TeamsUnbalanced)
-                        SendTeamMessage(self.team2, kTeamMessageTypes.TeamsUnbalanced)
-                        Print("Auto-team balance enabled")
-                        
-                    end
-                    
-                end
-                
-            -- The autobalance system itself has turned itself off.
-            elseif self.autoTeamBalanceEnabled then
-                wasDisabled = true
-            end
-            
-        -- The autobalance system was turned off by the admin.
-        elseif self.autoTeamBalanceEnabled then
-            wasDisabled = true
-        end
-        
-        if wasDisabled then
-        
-            self.team1:SetAutoTeamBalanceEnabled(false)
-            self.team2:SetAutoTeamBalanceEnabled(false)
-            self.teamsUnbalancedTime = 0
-            self.autoTeamBalanceEnabled = false
-            SendTeamMessage(self.team1, kTeamMessageTypes.TeamsBalanced)
-            SendTeamMessage(self.team2, kTeamMessageTypes.TeamsBalanced)
-            Print("Auto-team balance disabled")
-            
-        end
-        
-    end
-	
-	function NS2Gamerules:OnUpdate(timePassed)
+
+    function NS2Gamerules:OnUpdate(timePassed)
     
         PROFILE("NS2Gamerules:OnUpdate")
-        
-        GetEffectManager():OnUpdate(timePassed)
 
         if Server then
 
@@ -251,7 +174,7 @@ if Server then
                 
                 self:UpdateToReadyRoom()
                 self:UpdateMapCycle()
-                ServerAgeCheck(self)
+                self:ServerAgeCheck()
                 
                 self.timeSinceGameStateChanged = self.timeSinceGameStateChanged + timePassed
                 
@@ -263,260 +186,270 @@ if Server then
                 -- Send scores every so often
                 self:UpdatePings()
                 self:UpdateHealth()
-                self:UpdateTechPoints()
  
                 self:UpdatePlayerSkill()
-                self:UpdatePerfTags(timePassed)
-                self:UpdateCustomNetworkSettings()
+                self:UpdateNumPlayersForScoreboard()
                 self:SendTimeLeft()
                 
             end
 
             self.sponitor:Update(timePassed)
-            self.gameInfo:SetIsGatherReady(Server.GetIsGatherReady())
             self:UpdateWave()
             self:UpdateSounds(timePassed)
             
         end
         
     end
-	
-	function NS2Gamerules:CheckGameStart(dt)
-		if self:GetGameState() == kGameState.NotStarted then
-			if self.team1:GetNumPlayers() > 0 and self.team2:GetNumPlayers() > 0 or Shared.GetCheatsEnabled() then
-				self:SetGameState(kGameState.PreGame)
-			elseif self.team1:GetNumPlayers() > 0 then
-				if not self.nextGameStartMessageTime or Shared.GetTime() > self.nextGameStartMessageTime then
-					SendTeamMessage(self.team1, kTeamMessageTypes.NoCommander) --waiting for aliens
-					self.nextGameStartMessageTime = Shared.GetTime() + 10
-				end
-			end
-		elseif self:GetGameState() == kGameState.PreGame then
-			self.lsPreGameSecsLeft = math.max(self.lsPreGameSecsLeft - dt, 0)
-			if math.ceil(self.lsPreGameSecsLeft) == 3 then
+
+    function NS2Gamerules:CheckGameStart(dt)
+        if self:GetGameState() == kGameState.NotStarted then
+            if self.team1:GetNumPlayers() > 0 and self.team2:GetNumPlayers() > 0 or Shared.GetCheatsEnabled() then
+                self:SetGameState(kGameState.PreGame)
+            elseif self.team1:GetNumPlayers() > 0 then
+                if not self.nextGameStartMessageTime or Shared.GetTime() > self.nextGameStartMessageTime then
+                    SendTeamMessage(self.team1, kTeamMessageTypes.NoCommander) --waiting for aliens
+                    self.nextGameStartMessageTime = Shared.GetTime() + 10
+                end
+            end
+        elseif self:GetGameState() == kGameState.PreGame then
+            self.lsPreGameSecsLeft = math.max(self.lsPreGameSecsLeft - dt, 0)
+            if math.ceil(self.lsPreGameSecsLeft) == 3 then
                 self.worldTeam:PlayPrivateTeamSound(NS2Gamerules.kCountdownSound)
                 self.team1:PlayPrivateTeamSound(NS2Gamerules.kCountdownSound)
                 self.team2:PlayPrivateTeamSound(NS2Gamerules.kCountdownSound)
                 self.spectatorTeam:PlayPrivateTeamSound(NS2Gamerules.kCountdownSound)
-			end
-			
-			if self.lsPreGameSecsLeft <= 0 then
-				self:SetGameState(kGameState.Started)
-				self:SpawnAllDeadAlien()
-				self.sponitor:OnStartMatch()
-				self.playerRanking:StartGame()
-				self.preventGameEnd = true
-			end
+            end
 
-		end
+            if self.lsPreGameSecsLeft <= 0 then
+                self:SetGameState(kGameState.Started)
+                self:SpawnAllDeadAlien()
+                self.sponitor:OnStartMatch()
+                self.playerRanking:StartGame()
+                self.preventGameEnd = true
+            end
+
+        end
         
-	end
-	
-	function NS2Gamerules:CheckGameEnd()
+    end
 
-		PROFILE("NS2Gamerules:CheckGameEnd")
-		
-		if self:GetGameStarted() then
-			local marinesLeft = self.team1:GetNumAlivePlayers()
-			if self.marinesLeft ~= marinesLeft then
-				self.gameInfo:SetNumMarinesLeft( marinesLeft )
-				self.marinesLeft = marinesLeft
-			end		
+    function NS2Gamerules:CheckGameEnd()
 
-			--don't end the game with cheats enabled
-			if not Shared.GetCheatsEnabled() then
-				if self.marinesLeft == 0 then
+        PROFILE("NS2Gamerules:CheckGameEnd")
 
-					-- all marines gone, lose
-					self:EndGame(self.team2)
+        if self:GetGameStarted() then
+            local marinesLeft = self.team1:GetNumAlivePlayers()
+            if self.marinesLeft ~= marinesLeft then
+                self.gameInfo:SetNumMarinesLeft( marinesLeft )
+                self.marinesLeft = marinesLeft
+            end
 
-				elseif self.gameStartTime + kRoundSecs <= Shared.GetTime() then
+            --don't end the game with cheats enabled
+            if not Shared.GetCheatsEnabled() then
+                if self.marinesLeft == 0 then
 
-					-- marines survived the time - win!
-					self:EndGame(self.team1)
+                    -- all marines gone, lose
+                    self:EndGame(self.team2)
 
-				end
-			end
-		end
+                elseif self.gameStartTime + kRoundSecs <= Shared.GetTime() then
+
+                    -- marines survived the time - win!
+                    self:EndGame(self.team1)
+
+                end
+            end
+        end
 
     end
-	
+
     function NS2Gamerules:SetRoundLength(time)
-		kRoundSecs = time
-	end
+        kRoundSecs = time
+    end
     
     function NS2Gamerules:GetRoundLength()
-		return kRoundSecs
-	end
+        return kRoundSecs
+    end
     
-	function NS2Gamerules:SendTimeLeft()
+    function NS2Gamerules:SendTimeLeft()
         self.gameInfo:SetGameTimeLeft(self:GetTimeLeft())
-	end
-	
-	function NS2Gamerules:GetTimeLeft()
-		if self.gameState == kGameState.Started then
-			return self.gameStartTime + kRoundSecs - Shared.GetTime()
-		elseif self.gameState == kGameState.PreGame then
-			return self.timeGameStateChanged + kPreGameLength - Shared.GetTime()
-		else
-			return 0
-		end
-	end
-	
-	function NS2Gamerules:GetCanJoinTeamNumber(player, teamNumber)
-		local forceEvenTeams = Server.GetConfigSetting("force_even_teams_on_join", true)
+    end
 
-		if forceEvenTeams then
-		
-			local team1Players = self.team1:GetNumPlayers()
-			local team2Players = self.team2:GetNumPlayers()
-			
-			if (team1Players > team2Players) and (teamNumber == self.team1:GetTeamNumber()) then
-				return false
-			elseif (team2Players > team1Players) and (teamNumber == self.team2:GetTeamNumber()) then
-				return false
-			end
-			
-		end
-	
-		return true        
-	end
-	
-	function NS2Gamerules:JoinTeam(player, newTeamNumber, force)
+    function NS2Gamerules:GetTimeLeft()
+        if self.gameState == kGameState.Started then
+            return self.gameStartTime + kRoundSecs - Shared.GetTime()
+        elseif self.gameState == kGameState.PreGame then
+            return self.timeGameStateChanged + kPreGameLength - Shared.GetTime()
+        else
+            return 0
+        end
+    end
 
-		local client = Server.GetOwner(player)
-		if not client then return end
+    function NS2Gamerules:GetCanJoinTeamNumber(player, teamNumber)
+        local forceEvenTeams = Server.GetConfigSetting("force_even_teams_on_join", true)
 
-		local success = false
-		local newPlayer
+        if forceEvenTeams then
 
-		local oldPlayerWasSpectating = client and client:GetSpectatingPlayer()
-		local oldTeamNumber = player:GetTeamNumber()
+            local team1Players = self.team1:GetNumPlayers()
+            local team2Players = self.team2:GetNumPlayers()
 
-		-- Join new team
-		if oldTeamNumber ~= newTeamNumber or force then
+            if (team1Players > team2Players) and (teamNumber == self.team1:GetTeamNumber()) then
+                return false
+            elseif (team2Players > team1Players) and (teamNumber == self.team2:GetTeamNumber()) then
+                return false
+            end
 
-			if not Shared.GetCheatsEnabled() and self:GetGameStarted() and newTeamNumber ~= kTeamReadyRoom then
-				player.spawnBlockTime = Shared.GetTime() + kSuicideDelay
-			end
+        end
 
-			local team = self:GetTeam(newTeamNumber)
-			local oldTeam = self:GetTeam(oldTeamNumber)
+        return true
+    end
 
-			-- Remove the player from the old queue if they happen to be in one
-			if oldTeam then
-				oldTeam:RemovePlayerFromRespawnQueue(player)
-			end
+    function NS2Gamerules:JoinTeam(player, newTeamNumber, force)
 
-			-- Spawn immediately if going to ready room, game hasn't started, cheats on, or game started recently
-			if newTeamNumber == kTeamReadyRoom then
+        local client = Server.GetOwner(player)
+        if not client then return end
 
-				newPlayer = player:Replace(LastStand_ReadyRoomPlayer.kMapName, newTeamNumber)
-				success = true
+        if newTeamNumber ~= kSpectatorIndex and not self:GetCanJoinPlayingTeam(player) then
+            return false
+        end
 
-			elseif self:GetCanSpawnImmediately() or force then
+        if not force and not self:GetCanJoinTeamNumber(player, newTeamNumber) then
+            return false
+        end
 
-				success,newPlayer = team:ReplaceRespawnPlayer(player, nil, nil)
+        local success = false
+        local newPlayer
 
-			else
+        local oldPlayerWasSpectating = client and client:GetSpectatingPlayer()
+        local oldTeamNumber = player:GetTeamNumber()
 
-				-- Destroy the existing player and create a spectator in their place.
-				newPlayer = player:Replace(team:GetSpectatorMapName(), newTeamNumber)
+        -- Join new team
+        if oldTeamNumber ~= newTeamNumber or force then
 
-				-- Queue up the spectator for respawn.
-				team:PutPlayerInRespawnQueue(newPlayer)
+            if not Shared.GetCheatsEnabled() and self:GetGameStarted() and newTeamNumber ~= kTeamReadyRoom then
+                player.spawnBlockTime = Shared.GetTime() + kSuicideDelay
+            end
 
-				success = true
+            local team = self:GetTeam(newTeamNumber)
+            local oldTeam = self:GetTeam(oldTeamNumber)
 
-			end
+            -- Remove the player from the old queue if they happen to be in one
+            if oldTeam then
+                oldTeam:RemovePlayerFromRespawnQueue(player)
+            end
 
-			local clientUserId = client:GetUserId()
-			--Save old pres
-			if oldTeam == self.team1 or oldTeam == self.team2 then
-				if not self.clientpres[clientUserId] then self.clientpres[clientUserId] = {} end
-				self.clientpres[clientUserId][oldTeamNumber] = player:GetResources()
-			end
+            -- Spawn immediately if going to ready room, game hasn't started, cheats on, or game started recently
+            if newTeamNumber == kTeamReadyRoom then
 
-			-- Update frozen state of player based on the game state and player team.
-			if team == self.team1 or team == self.team2 then
+                newPlayer = player:Replace(LastStand_ReadyRoomPlayer.kMapName, newTeamNumber)
+                success = true
 
-				local devMode = Shared.GetDevMode()
-				local inCountdown = self:GetGameState() == kGameState.Countdown
-				if not devMode and inCountdown then
-					newPlayer.frozen = true
-				end
+            elseif self:GetCanSpawnImmediately() or force then
 
-				local pres = self.clientpres[clientUserId] and self.clientpres[clientUserId][newTeamNumber]
-				newPlayer:SetResources( pres or ConditionalValue(team == self.team1, kMarineInitialIndivRes, kAlienInitialIndivRes) )
+                success,newPlayer = team:ReplaceRespawnPlayer(player, nil, nil)
 
-			else
+            else
 
-				-- Ready room or spectator players should never be frozen
-				newPlayer.frozen = false
+                -- Destroy the existing player and create a spectator in their place.
+                newPlayer = player:Replace(team:GetSpectatorMapName(), newTeamNumber)
 
-			end
+                -- Queue up the spectator for respawn.
+                team:PutPlayerInRespawnQueue(newPlayer)
+
+                success = true
+
+            end
+
+            local clientUserId = client:GetUserId()
+            --Save old pres
+            if oldTeam == self.team1 or oldTeam == self.team2 then
+                if not self.clientpres[clientUserId] then self.clientpres[clientUserId] = {} end
+                self.clientpres[clientUserId][oldTeamNumber] = player:GetResources()
+            end
+
+            -- Update frozen state of player based on the game state and player team.
+            if team == self.team1 or team == self.team2 then
+
+                local devMode = Shared.GetDevMode()
+                local inCountdown = self:GetGameState() == kGameState.Countdown
+                if not devMode and inCountdown then
+                    newPlayer.frozen = true
+                end
+
+                local pres = self.clientpres[clientUserId] and self.clientpres[clientUserId][newTeamNumber]
+                newPlayer:SetResources( pres or ConditionalValue(team == self.team1, kMarineInitialIndivRes, kAlienInitialIndivRes) )
+
+            else
+
+                -- Ready room or spectator players should never be frozen
+                newPlayer.frozen = false
+
+            end
 
 
-			newPlayer:TriggerEffects("join_team")
+            newPlayer:TriggerEffects("join_team")
 
-			if success then
+            if success then
 
-				self.sponitor:OnJoinTeam(newPlayer, team)
+                self.sponitor:OnJoinTeam(newPlayer, team)
 
-				local newPlayerClient = Server.GetOwner(newPlayer)
-				if oldPlayerWasSpectating then
-					newPlayerClient:SetSpectatingPlayer(nil)
-				end
+                local newPlayerClient = Server.GetOwner(newPlayer)
+                if oldPlayerWasSpectating then
+                    newPlayerClient:SetSpectatingPlayer(nil)
+                end
 
-				if newPlayer.OnJoinTeam then
-					newPlayer:OnJoinTeam()
-				end
+                if newPlayer.OnJoinTeam then
+                    newPlayer:OnJoinTeam()
+                end
 
-				-- Check if concede sequence is in progress, and if so, set this new player up to
-				-- see it.
-				if GetConcedeSequenceActive() then
-					GetConcedeSequence():AddPlayer(newPlayer)
-				end
+                if newTeamNumber == kTeam1Index or newTeamNumber == kTeam2Index then
+                    self.playerRanking:SetEntranceTime( newPlayer, newTeamNumber )  --Hive2 added team param
+                elseif oldTeamNumber == kTeam1Index or oldTeamNumber == kTeam2Index then
+                    self.playerRanking:SetExitTime( newPlayer, oldTeamNumber ) --Hive2 added team param
+                end
 
-				if newTeamNumber == kTeam1Index or newTeamNumber == kTeam2Index then
-					self.playerRanking:SetEntranceTime( newPlayer, newTeamNumber )  --Hive2 added team param
-				elseif oldTeamNumber == kTeam1Index or oldTeamNumber == kTeam2Index then
-					self.playerRanking:SetExitTime( newPlayer, oldTeamNumber ) --Hive2 added team param
-				end
+                if newTeamNumber == kSpectatorIndex then
+                    newPlayer:SetSpectatorMode(kSpectatorMode.Overhead)
 
-				Server.SendNetworkMessage(newPlayerClient, "SetClientTeamNumber", { teamNumber = newPlayer:GetTeamNumber() }, true)
+                    -- add player to list of spectators if there are spectator lots available
+                    local numSpecs = Server.GetNumSpectators()
+                    if numSpecs < Server.GetMaxSpectators() and newPlayer:GetIsSpectator() == false then
+                        newPlayer:SetIsSpectator(true)
+                    end
+                else
+                    --remove player from spectator list
+                    if newPlayer:GetIsSpectator() then
+                        newPlayer:SetIsSpectator(false)
+                    end
+                end
 
-				if newTeamNumber == kSpectatorIndex then
-					newPlayer:SetSpectatorMode(kSpectatorMode.Overhead)
-				end
+                Server.SendNetworkMessage(newPlayerClient, "SetClientTeamNumber", { teamNumber = newPlayer:GetTeamNumber() }, true)
 
-				self.botTeamController:UpdateBots()
-			end
+                self.botTeamController:UpdateBots()
+            end
 
-			return success, newPlayer
+            return success, newPlayer
 
-		end
+        end
 
-		-- Return old player
-		return success, player
+        -- Return old player
+        return success, player
 
-	end
-	
-	function NS2Gamerules:GetNumMarinePlayers()
-		return self.team1:GetNumPlayers()
- 	end
-	
-	function NS2Gamerules:GetMarineBase()
-	end
-	
-	function NS2Gamerules:SetPreGameLength(length)
+    end
+
+    function NS2Gamerules:GetNumMarinePlayers()
+        return self.team1:GetNumPlayers()
+    end
+
+    function NS2Gamerules:GetMarineBase()
+    end
+
+    function NS2Gamerules:SetPreGameLength(length)
         kPreGameLength = length
     end
     
     function NS2Gamerules:GetPregameLength()
         return Shared.GetCheatsEnabled() and 0 or kPreGameLength
     end
-	
+
     function NS2Gamerules:SetNumSecondsPerWave(length)
         kNumSecondsPerWave = length
     end
@@ -557,11 +490,11 @@ if Server then
         end
     end
 
-	function NS2Gamerules:SpawnAllDeadAlien()
-		for _, player in ientitylist(Shared.GetEntitiesWithClassname("AlienSpectator")) do
-			player:SpawnPlayer()
-		end
-	end
+    function NS2Gamerules:SpawnAllDeadAlien()
+        for _, player in ientitylist(Shared.GetEntitiesWithClassname("AlienSpectator")) do
+            player:SpawnPlayer()
+        end
+    end
 
     function NS2Gamerules:UpdateWave()
         if self.gameState == kGameState.Started then
@@ -577,9 +510,9 @@ if Server then
                 self:SpawnAllDeadAlien()
 
                 if wave % 3 == 0 then
-	                for _, pile in ientitylist(Shared.GetEntitiesWithClassname("EquipPile")) do
-		                pile:SpewCat()
-	                end
+                    for _, pile in ientitylist(Shared.GetEntitiesWithClassname("EquipPile")) do
+                        pile:SpewCat()
+                    end
                 end
 
                 oldWave = wave
