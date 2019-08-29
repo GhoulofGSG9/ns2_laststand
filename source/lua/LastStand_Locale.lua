@@ -5,7 +5,7 @@ local LastStandLocale = {}
 LastStandLocale.Strings = {}
 LastStandLocale.Sources = {}
 
-Locale.DefaultLanguage = "enUS"
+LastStandLocale.DefaultLanguage = "enUS"
 
 -- Get all available locale files now, so we don't keep trying to open them later.
 local LangFiles = {}
