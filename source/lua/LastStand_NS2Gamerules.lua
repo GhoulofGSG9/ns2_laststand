@@ -15,10 +15,6 @@ if Server then
             self.gameInfo:SetState(state)
             self.timeGameStateChanged = Shared.GetTime()
             self.timeSinceGameStateChanged = 0
-            
-            local frozenState = (state == kGameState.Countdown) and (not Shared.GetDevMode())
-            self.team1:SetFrozenState(frozenState)
-            self.team2:SetFrozenState(frozenState)
 
             if self.gameState == kGameState.Started then
 
