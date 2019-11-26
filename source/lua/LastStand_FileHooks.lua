@@ -46,7 +46,14 @@ ModLoader.SetupFileHook( "lua/GUIInsight_TopBar.lua", "lua/LastStand_GUIInsight_
 
 --Block all not needed Vanilla Files here
 local kBlockedFiles ={ 
-    "lua/GUIWaitingForAutoTeamBalance.lua", "lua/GUIInsight_TechPoints.lua","lua/GUIInsight_Location.lua","lua/GUIInsight_Graphs.lua", "lua/GUIReadyRoomOrders.lua", "lua/GUIInsight_TopBar.lua"
+    "lua/GUIWaitingForAutoTeamBalance.lua",
+    "lua/GUIInsight_TechPoints.lua",
+    "lua/GUIInsight_Location.lua",
+    "lua/GUIInsight_Graphs.lua",
+    "lua/GUIReadyRoomOrders.lua",
+    "lua/GUIInsight_TopBar.lua",
+    "lua/Hud2/topBar/GUIHudTopBar.lua",
+    "lua/Hud2/topBar/GUIHudTopBarForLocalTeam.lua"
 }
 
 for _,fileName in ipairs(kBlockedFiles) do
