@@ -78,3 +78,6 @@ function AlienTeam:UpdateBioMassLevel()
     self.maxBioMassLevel = 12
     
 end
+
+function AlienTeam:OnResetComplete()
+end
