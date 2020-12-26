@@ -24,7 +24,6 @@ if Server then
                 self.gameStartTime = Shared.GetTime()
                 
                 self.gameInfo:SetStartTime(self.gameStartTime)
-                self:ResetPlayerScores()
                 
                 -- signal all the equipment piles
                 -- we should really have an event system here..
@@ -60,6 +59,9 @@ if Server then
     end
 
     function NS2Gamerules:ResetGame()
+
+        StatsUI_ResetStats()
+
         TournamentModeOnReset()
         
         -- Destroy any map entities that are still around
@@ -146,6 +148,8 @@ if Server then
         
         self.team1:OnResetComplete()
         self.team2:OnResetComplete()
+
+        StatsUI_InitializeTeamStatsAndTechPoints(self)
     end
 
     function NS2Gamerules:OnUpdate(timePassed)
@@ -189,7 +193,6 @@ if Server then
                 
             end
 
-            self.sponitor:Update(timePassed)
             self:UpdateWave()
             self:UpdateSounds(timePassed)
             
@@ -219,7 +222,6 @@ if Server then
             if self.lsPreGameSecsLeft <= 0 then
                 self:SetGameState(kGameState.Started)
                 self:SpawnAllDeadAlien()
-                self.sponitor:OnStartMatch()
                 self.playerRanking:StartGame()
                 self.preventGameEnd = true
             end
@@ -384,8 +386,6 @@ if Server then
             newPlayer:TriggerEffects("join_team")
 
             if success then
-
-                self.sponitor:OnJoinTeam(newPlayer, team)
 
                 local newPlayerClient = Server.GetOwner(newPlayer)
                 if oldPlayerWasSpectating then
